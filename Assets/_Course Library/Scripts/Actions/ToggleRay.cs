@@ -20,8 +20,8 @@ public class ToggleRay : MonoBehaviour
 
     private void Awake()
     {
-        rayInteractor = GetComponent<XRRayInteractor>();
-        SwitchInteractors(false);
+        //rayInteractor = GetComponent<XRRayInteractor>();
+        //SwitchInteractors(false);
     }
 
     public void ActivateRay()
@@ -48,5 +48,11 @@ public class ToggleRay : MonoBehaviour
         isSwitched = value;
         rayInteractor.enabled = value;
         directInteractor.enabled = !value;
+    }
+    public void RayToggle()
+    {
+        //Debug.Log(!gameObject.activeSelf);
+        gameObject.SetActive(!gameObject.activeSelf);
+        //SwitchInteractors(!gameObject.activeSelf);
     }
 }
