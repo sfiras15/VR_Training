@@ -39,10 +39,10 @@ public class Interactables : XRGrabInteractable
     protected override void OnActivated(ActivateEventArgs args)
     {
         base.OnActivated(args);
-        if (locomotionSo != null)
-        {
-            if (locomotionSo.Held) Debug.Log("true");
-        }
+        //if (locomotionSo != null)
+        //{
+        //    if (locomotionSo.Held) Debug.Log("true");
+        //}
 
     }
 
