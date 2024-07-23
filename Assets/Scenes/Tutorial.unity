@@ -4339,7 +4339,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9c4eaf08d670b6b43a2dec7ae49ecf6c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  interactKey: 0
+  interactKey: 101
   questInfo: {fileID: 11400000, guid: 7fefe99885eecc64791cd4b03d0627a3, type: 2}
   startPoint: 0
   finishPoint: 0
