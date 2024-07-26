@@ -15,6 +15,6 @@ public class TeleportQuestStep : QuestStep
 
     public void TeleportationOccurred()
     {
-        FinishQuestStep();
+       FinishQuestStep();
     }
 }

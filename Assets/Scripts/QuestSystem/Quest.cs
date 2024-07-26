@@ -8,7 +8,7 @@ public class Quest
 
     public QuestState state;
 
-    private int currentQuestIndex;
+    public int currentQuestIndex { get; private set; }
 
     public Quest(QuestInfoSO questInfo)
     {

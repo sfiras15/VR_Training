@@ -10,6 +10,7 @@ public class QuestEvents
         if (onStartQuest != null) onStartQuest(id);
     }
 
+
     public event Action<string> onAdvanceQuest;
 
     public void AdvanceQuest(string id)

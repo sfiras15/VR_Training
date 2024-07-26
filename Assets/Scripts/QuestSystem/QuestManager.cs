@@ -9,13 +9,15 @@ public class QuestManager : MonoBehaviour
 
     [SerializeField] private QuestInfoSO[] questInfoSOs;
 
+    [SerializeField] private QuestUiSo questUiSO;
+
     private int currentPlayerLevel;
     private void Awake()
     {
         questMap = CreateQuestMap();
-        var quest = GetQuestById("TutorialQuest");
-        Debug.Log(quest.info.displayName);
-        Debug.Log(quest.info.goldReward);
+        //var quest = GetQuestById("TutorialQuest");
+        //Debug.Log(quest.info.displayName);
+        //Debug.Log(quest.info.goldReward);
     }
 
 
@@ -35,6 +37,12 @@ public class QuestManager : MonoBehaviour
     public void StartQuest(string id)
     {
         Quest quest = GetQuestById(id);
+
+        if (questUiSO != null)
+        {
+            questUiSO.currentQuest = quest;
+            questUiSO.StartQuestUI();
+        }
         ChangeQuestState(quest.info.id, QuestState.IN_PROGRESS);
         quest.InstantiateCurrentQuestStepPrefab(this.transform);
     }
@@ -42,6 +50,12 @@ public class QuestManager : MonoBehaviour
     {
         Quest quest = GetQuestById(id);
 
+        
+        if (questUiSO != null)
+        {
+            questUiSO.currentQuest = quest;
+            questUiSO.UpdateQuestUI(quest.currentQuestIndex);
+        }
         quest.MoveToNextStep();
         if (quest.CurrentStepExists())
         {
@@ -50,8 +64,12 @@ public class QuestManager : MonoBehaviour
         else
         {
             //ChangeQuestState(quest.info.id, QuestState.CAN_FINISH);
-            FinishQuest(id);
+            //FinishQuest(id);
+
+            GameEventsManager.instance.questEvents.FinishQuest(quest.info.id);
         }
+        
+
         Debug.Log("advance quest : " + id);
     }
     public void FinishQuest(string id)
@@ -59,6 +77,11 @@ public class QuestManager : MonoBehaviour
         Quest quest = GetQuestById(id);
 
         ChangeQuestState(quest.info.id, QuestState.FINISHED);
+        //if (questUiSO != null)
+        //{
+        //    questUiSO.currentQuest = quest;
+        //    questUiSO.UpdateQuestUI(quest.currentQuestIndex);
+        //}
 
         ClaimReward(quest.info.goldReward);
         Debug.Log("finish quest : " + id+ " QuestState : " + quest.state);
@@ -95,7 +118,7 @@ public class QuestManager : MonoBehaviour
                 Debug.LogWarning("Found duplicate Quest id in the dictionary : " +  quest.id);
             }
         }
-        if (idToQuestMap != null) Debug.Log("Map successfull");
+        //if (idToQuestMap != null) Debug.Log("Map successfull");
         return idToQuestMap;
 
     }
@@ -150,7 +173,11 @@ public class QuestManager : MonoBehaviour
         {
             if ((quest.state == QuestState.REQUIREMENT_NOT_MET) && CheckRequirements(quest))
             {
-                ChangeQuestState(quest.info.id, QuestState.CAN_START);
+                //ChangeQuestState(quest.info.id, QuestState.CAN_START);
+                if (questUiSO != null) questUiSO.currentQuest = quest;
+                StartQuest(quest.info.id);
+                
+                Debug.Log("Quest : " + quest.info.displayName + " Status : " + quest.state);
             }
         }
     }

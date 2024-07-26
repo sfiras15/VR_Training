@@ -44,3 +44,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4a354c097b6b7964ea35db22db7d5c66, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <questStepDescription>k__BackingField: Aim and teleport to the ring

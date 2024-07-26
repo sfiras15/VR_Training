@@ -44,4 +44,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6849f2f0e0e2e4547a2d52b37043118c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <questStepDescription>k__BackingField: get coins
   coinsToComplete: 1

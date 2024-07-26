@@ -4,20 +4,26 @@ using UnityEngine;
 
 public abstract class QuestStep : MonoBehaviour
 {
-    private bool isFinished = false;
+    [field: SerializeField] public string questStepDescription { get; private set; }
+    public  bool isFinished { get; private set; }
 
-    private string questId;
+    protected string questId;
 
     public void InitializeQuestId(string id)
     {
         questId = id;
     }
+
+    public string Id
+    {
+        get { return questId; }
+    }
     protected void FinishQuestStep()
     {
         if (!isFinished)
         {
+            
             isFinished = true;
-
             //Event to advance the quest 
 
             GameEventsManager.instance.questEvents.AdvanceQuest(questId);

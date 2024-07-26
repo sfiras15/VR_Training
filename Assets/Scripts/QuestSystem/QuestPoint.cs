@@ -20,6 +20,9 @@ public class QuestPoint : MonoBehaviour
     [SerializeField] private bool startPoint;
     [SerializeField] private bool finishPoint;
 
+    
+
+
 
 
 
@@ -57,7 +60,7 @@ public class QuestPoint : MonoBehaviour
         if (quest.info.id.Equals(questId))
         {
             currentQuestState = quest.state;
-            Debug.Log("quest with id: " + questId + " updated to state : " + currentQuestState);
+           // Debug.Log("quest with id: " + questId + " updated to state : " + currentQuestState);
         }
     }
 
@@ -83,6 +86,7 @@ public class QuestPoint : MonoBehaviour
             if (currentQuestState.Equals(QuestState.CAN_START) && startPoint)
             {
                 GameEventsManager.instance.questEvents.StartQuest(questId);
+
             }
             else if (currentQuestState.Equals(QuestState.CAN_FINISH) && finishPoint)
             {

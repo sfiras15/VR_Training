@@ -44,3 +44,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 653a86b0ecb721d4eadb97e4044f0cb1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <questStepDescription>k__BackingField: Activate the item

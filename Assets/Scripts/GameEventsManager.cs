@@ -9,9 +9,12 @@ public class GameEventsManager : MonoBehaviour
 
     public event Action<int> onGoldGained;
 
+
+
     public QuestEvents questEvents;
 
     public TutorialEvents tutorialEvents;
+    
 
     private int goldAmount;
     private void Awake()
