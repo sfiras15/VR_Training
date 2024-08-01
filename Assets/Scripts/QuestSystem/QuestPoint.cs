@@ -1,11 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(CircleCollider2D))]
+/// <summary>
+/// Starts the current questInfo quest, 
+/// </summary>
 public class QuestPoint : MonoBehaviour
 {
-    private bool isNearPlayer = false;
 
     [SerializeField] private KeyCode interactKey;
     [Header("Quest")]
@@ -15,37 +14,17 @@ public class QuestPoint : MonoBehaviour
     private QuestState currentQuestState;
     private string questId;
 
+
+    // In case we want to add npc for starting/finishing the quest
     [Header("Config")]
 
     [SerializeField] private bool startPoint;
     [SerializeField] private bool finishPoint;
 
-    
-
-
-
-
-
     private void Awake()
     {
         questId = questInfo.id;
     }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (collision.gameObject.CompareTag("Player"))
-        {
-            isNearPlayer = true;
-        }
-    }
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-        if (collision.gameObject.CompareTag("Player"))
-        {
-            isNearPlayer = false;
-        }
-    }
-
     private void OnEnable()
     {
         GameEventsManager.instance.questEvents.onStateChangeQuest += ChangeQuestState;
@@ -67,39 +46,18 @@ public class QuestPoint : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //interact();
-        if (Input.GetKeyDown(interactKey))
-        {
-            StartQuest();
-        }
+        // this was done for testing
+        //if (Input.GetKeyDown(interactKey))
+        //{
+        //    StartQuest();
+        //}
         
-    }
-
-    public void interact()
-    {
-        if (!isNearPlayer)
-        {
-            return;
-        }
-        if (Input.GetKeyDown(interactKey))
-        {
-            if (currentQuestState.Equals(QuestState.CAN_START) && startPoint)
-            {
-                GameEventsManager.instance.questEvents.StartQuest(questId);
-
-            }
-            else if (currentQuestState.Equals(QuestState.CAN_FINISH) && finishPoint)
-            {
-                GameEventsManager.instance.questEvents.FinishQuest(questId);
-            }
-
-           //GameEventsManager.instance.questEvents.AdvanceQuest(questId);
-
-        } 
     }
 
     // If called on scene load it will not work because of the order of execution (scene load happens before the update method of the questManager)
     // you have to force start it in order to work
+
+    // this function is called from the welcomeCanvas onSceneLoad, might change it later
     public void StartQuest()
     {
         //Debug.Log("starting");

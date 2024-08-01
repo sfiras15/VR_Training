@@ -24,9 +24,9 @@ public class QuestInfoSO : ScriptableObject
 
     [Header("Rewards")]
 
-    public int goldReward;
+    // add rewards later
 
-    //public int xpReward;
+    public int xpReward;
 
 
     // ensure that the id is always the name of the ScriptableObject

@@ -3,6 +3,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
+/// <summary>
+/// Used to communicate between the questUI and the questManager in order to update the UI for the questCanvas.
+/// </summary>
 [CreateAssetMenu(fileName = "ScriptableObjects", menuName = "ScriptableObjects/QuestUI", order = 2)]
 public class QuestUiSo : ScriptableObject
 {

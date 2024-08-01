@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Events;
@@ -17,11 +18,13 @@ public class ShowMessageFromList : MonoBehaviour
     [Tooltip("The list of messages that are shown")]
     [TextArea] public List<string> messages = new List<string>();
 
-    private int index = 0;
+    private int index = -1;
+
+    private bool isClicked = false;
 
     private void Start()
     {
-        ShowMessage();
+        //ShowMessage();
     }
 
     public void NextMessage()
@@ -35,6 +38,37 @@ public class ShowMessageFromList : MonoBehaviour
         else
         {
             ShowMessage();
+        }
+    }
+
+    // this method is only called for the tablet in the tutorial as a quick fix
+    public void ShowContinuousText()
+    {
+        if (!isClicked)
+        {
+            isClicked = true;
+            StartCoroutine(ShowMessagesRepeatedly());
+        }
+        
+    }
+
+    private IEnumerator ShowMessagesRepeatedly()
+    {
+        while (true)
+        {
+            int newIndex = ++index % messages.Count;
+
+            if (newIndex < index)
+            {
+                OnComplete.Invoke();
+                yield break; // Stop the coroutine if OnComplete is invoked
+            }
+            else
+            {
+                ShowMessage();
+            }
+
+            yield return new WaitForSeconds(5.5f); // the time it takes for the tts to read each paragraph
         }
     }
 

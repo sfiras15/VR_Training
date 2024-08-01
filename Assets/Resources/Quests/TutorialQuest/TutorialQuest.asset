@@ -20,4 +20,4 @@ MonoBehaviour:
   - {fileID: 6103426788873799479, guid: d38ba98d1982ea04b844fdc40cfc09a1, type: 3}
   - {fileID: 7759551836863278778, guid: 4df747d1bc154ba459e0c2156fa9f943, type: 3}
   - {fileID: 5449114257061900826, guid: 8fb9d0ed7d0080e4aa471db5619d53e0, type: 3}
-  goldReward: 0
+  xpReward: 0

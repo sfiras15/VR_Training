@@ -1,10 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.XR.Interaction.Toolkit;
 
+/// <summary>
+/// Manages locomotion for VR, including snap turning and joystick movement.
+/// </summary>
 public class LocomotionManager : MonoBehaviour
 {
     [SerializeField] private ActionBasedSnapTurnProvider snapTurnProvide;

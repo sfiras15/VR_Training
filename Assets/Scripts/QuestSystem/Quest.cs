@@ -1,7 +1,10 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
+
+/// <summary>
+/// Links each quest to it's questInfoSO and holds the state of the quest.
+/// Also have various qol functions for the questManager
+/// </summary>
 public class Quest
 {
     public QuestInfoSO info;

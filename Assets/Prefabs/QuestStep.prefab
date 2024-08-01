@@ -145,7 +145,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2437460588527530766}
-  - component: {fileID: 9123746021785652000}
+  - component: {fileID: 827955189016790024}
   m_Layer: 0
   m_Name: QuestStep
   m_TagString: Untagged
@@ -174,7 +174,7 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &9123746021785652000
+--- !u!114 &827955189016790024
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -183,7 +183,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 5080549451342088656}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d9f81a02c744f8d4b85f12c404420e20, type: 3}
+  m_Script: {fileID: 11500000, guid: 5b8a34403b5e17247a021f3c37a213e1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
   stepText: {fileID: 8047759280742782766}

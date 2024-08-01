@@ -3,6 +3,11 @@ using System.Collections.Generic;
 using System.Security.Claims;
 using UnityEngine;
 
+
+/// <summary>
+/// This class is responsible for holding reference to all the quests that are in the game.
+/// Also responsible for starting,updating,finishing the quests all while changing their appropriate info
+/// </summary>
 public class QuestManager : MonoBehaviour
 {
     private Dictionary<string, Quest> questMap;
@@ -66,30 +71,23 @@ public class QuestManager : MonoBehaviour
             //ChangeQuestState(quest.info.id, QuestState.CAN_FINISH);
             //FinishQuest(id);
 
+            // trigger this event to update the UI and update the state of the quests
             GameEventsManager.instance.questEvents.FinishQuest(quest.info.id);
         }
-        
-
         Debug.Log("advance quest : " + id);
     }
     public void FinishQuest(string id)
     {
         Quest quest = GetQuestById(id);
-
         ChangeQuestState(quest.info.id, QuestState.FINISHED);
-        //if (questUiSO != null)
-        //{
-        //    questUiSO.currentQuest = quest;
-        //    questUiSO.UpdateQuestUI(quest.currentQuestIndex);
-        //}
-
-        ClaimReward(quest.info.goldReward);
-        Debug.Log("finish quest : " + id+ " QuestState : " + quest.state);
+        ClaimReward(quest.info.xpReward);
+        //Debug.Log("finish quest : " + id+ " QuestState : " + quest.state);
     }
 
+    // add rewards layer , maybe score or something 
     private void ClaimReward(int value)
     {
-        GameEventsManager.instance.GoldGained(value);
+        
     }
     private void Start()
     {
@@ -98,8 +96,6 @@ public class QuestManager : MonoBehaviour
         {
             GameEventsManager.instance.questEvents.StateChangeQuest(quest);
         }
-
-
     }
     private Dictionary<string, Quest> CreateQuestMap()
     {
@@ -174,10 +170,11 @@ public class QuestManager : MonoBehaviour
             if ((quest.state == QuestState.REQUIREMENT_NOT_MET) && CheckRequirements(quest))
             {
                 //ChangeQuestState(quest.info.id, QuestState.CAN_START);
+                // so that the UI loads the current active quest;
                 if (questUiSO != null) questUiSO.currentQuest = quest;
                 StartQuest(quest.info.id);
                 
-                Debug.Log("Quest : " + quest.info.displayName + " Status : " + quest.state);
+                //Debug.Log("Quest : " + quest.info.displayName + " Status : " + quest.state);
             }
         }
     }
