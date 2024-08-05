@@ -30,4 +30,8 @@ public class GameEventsManager : MonoBehaviour
     {
         tutorialEvents.ItemActivated();
     }
+    public void WelcomeCanvas()
+    {
+        tutorialEvents.WelcomeCanvasFinished();
+    }
 }

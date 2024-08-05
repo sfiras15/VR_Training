@@ -16,8 +16,11 @@ public class OnButtonPress : MonoBehaviour
     // When the button is released
     public UnityEvent OnRelease = new UnityEvent();
 
+    private bool allowPress;
+
     private void Awake()
     {
+        allowPress = false;
         action.started += Pressed;
         action.canceled += Released;
     }
@@ -31,20 +34,35 @@ public class OnButtonPress : MonoBehaviour
     private void OnEnable()
     {
         action.Enable();
+        if (GameEventsManager.instance != null)
+        {
+            GameEventsManager.instance.tutorialEvents.onWelcomeCanvasFinished += AllowPressStatus;
+        }
     }
 
     private void OnDisable()
     {
         action.Disable();
+        if (GameEventsManager.instance != null)
+        {
+            GameEventsManager.instance.tutorialEvents.onWelcomeCanvasFinished -= AllowPressStatus;
+        }
     }
 
+
+    private void AllowPressStatus()
+    {
+        allowPress = true;
+    }
     private void Pressed(InputAction.CallbackContext context)
     {
-        OnPress.Invoke();
+        if (allowPress)
+            OnPress.Invoke();
     }
 
     private void Released(InputAction.CallbackContext context)
     {
-        OnRelease.Invoke();
+        if (allowPress)
+            OnRelease.Invoke();
     }
 }
