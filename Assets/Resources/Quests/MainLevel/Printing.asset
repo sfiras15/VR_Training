@@ -10,15 +10,12 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 81dad62422dcf5543ad0b7e248e5982a, type: 3}
-  m_Name: TutorialQuest
+  m_Name: Printing
   m_EditorClassIdentifier: 
-  <id>k__BackingField: TutorialQuest
-  displayName: Tutorial
+  <id>k__BackingField: Printing
+  displayName: Print
   playerLevelRequirement: 0
-  preRequisiteQuests:
-  - {fileID: 11400000, guid: a4ffcdfb91990bb48ba2235d015fb181, type: 2}
+  preRequisiteQuests: []
   questStepsPrefabs:
-  - {fileID: 6103426788873799479, guid: d38ba98d1982ea04b844fdc40cfc09a1, type: 3}
-  - {fileID: 7759551836863278778, guid: 4df747d1bc154ba459e0c2156fa9f943, type: 3}
-  - {fileID: 5449114257061900826, guid: 8fb9d0ed7d0080e4aa471db5619d53e0, type: 3}
+  - {fileID: 3868073662722483118, guid: adf588c9f36619d41a33e21e1af31059, type: 3}
   xpReward: 0

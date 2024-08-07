@@ -11,12 +11,19 @@ public class GameEventsManager : MonoBehaviour
 
     // this was for testing  the quest system mostly, it's not in the tutorial anymore
     public TutorialEvents tutorialEvents;
+
+    public MainLevelQuests mainLevelQuests;
     private void Awake()
     {
         if (instance == null) instance = this;  
 
         questEvents = new QuestEvents();
         tutorialEvents = new TutorialEvents();
+        mainLevelQuests = new MainLevelQuests();
+    }
+    public void HeatEventOccurred()
+    {
+        mainLevelQuests.HeatLevelAchieved();
     }
     public void TeleportationOccurred()
     {
