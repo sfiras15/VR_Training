@@ -10,14 +10,8 @@ public enum TemperatureType
     BED
 }
 
-public class Temperature : MonoBehaviour
+public class Temperature : TextArea
 {
 
     public TemperatureType type;
-    [SerializeField] private TextMeshProUGUI textUI;
-
-    public void UpdateText(string value)
-    {
-        textUI.text = value;
-    }
 }

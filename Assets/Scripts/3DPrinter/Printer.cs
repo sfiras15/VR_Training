@@ -9,14 +9,24 @@ using UnityEngine;
 /// </summary>
 public class Printer
 {
+    // Temperature
     public int currentNozzleTemperature;
     public int targetNozzleTemperature;
     public int currentBedTemperature;
     public int targetBedTemperature;
-    public int incrementTemperature;   
+    public int incrementTemperature; 
+    
+    // Position
     public Vector3 nozzlePosition;
+    public Vector3 homePosition;
+    public float incrementPosition;
+
+    // BabySteps
     public float probeOffset;
 
+    // Extrusion
+    public float incrementExtrusion;
+    public float extrudedValue;
 
     // default values change them if necessary
     public Printer()
@@ -26,7 +36,16 @@ public class Printer
         currentBedTemperature = 35;
         targetBedTemperature = 0;
         incrementTemperature = 10;
-        nozzlePosition = new Vector3(0f,0f,-2.15f);// check z value later
+
+
+        nozzlePosition = new Vector3(2f,10f,-2f);// check z value later
+        homePosition = new Vector3(0f, 3f, 5f); // this is just an example check real values with the 3d printer model 
+        incrementPosition = 0.1f;
+
         probeOffset = 0f;
+
+
+        incrementExtrusion = 10.00f;
+        extrudedValue = 0f;
     }
 }

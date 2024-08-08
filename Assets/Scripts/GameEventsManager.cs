@@ -21,10 +21,22 @@ public class GameEventsManager : MonoBehaviour
         tutorialEvents = new TutorialEvents();
         mainLevelQuests = new MainLevelQuests();
     }
+    // Main level Events
     public void HeatEventOccurred()
     {
         mainLevelQuests.HeatLevelAchieved();
     }
+    public void MaterialEventOccurred()
+    {
+        mainLevelQuests.MaterialExtruded();
+    }
+    public void HomeEventOccurred()
+    {
+        mainLevelQuests.HomePositionAchieved();
+    }
+
+
+    // Tutorial level Events
     public void TeleportationOccurred()
     {
         tutorialEvents.LocationChanged();
