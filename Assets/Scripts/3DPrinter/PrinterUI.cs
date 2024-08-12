@@ -14,12 +14,17 @@ public class PrinterUI : MonoBehaviour
     private Position[] positions;
 
     private float updateInterval = 2f; // Time in seconds between updates
-    private int incrementValue = 5;
+    private int incrementValue = 5; // temperature increment
 
     // bools  for the quest system
     private bool heatLevelEventInvoked = false;
     private bool materialEventInvoked = false;
     private bool homeEventInvoked = false;
+
+    // variables for cooling down temperature 
+
+    private bool isBedCoolingDown = false;
+    private bool isNozzleCoolingDown = false;
 
     private void Awake()
     {
@@ -169,18 +174,37 @@ public class PrinterUI : MonoBehaviour
     {
         while (true)
         {
-            // Increment current nozzle temperature towards target nozzle temperature
-            if (printer.currentNozzleTemperature < printer.targetNozzleTemperature)
+            if (!isNozzleCoolingDown)
             {
-                printer.currentNozzleTemperature += Mathf.Min(incrementValue, printer.targetNozzleTemperature - printer.currentNozzleTemperature);
+                // Increment current nozzle temperature towards target nozzle temperature
+                if (printer.currentNozzleTemperature < printer.targetNozzleTemperature)
+                {
+                    printer.currentNozzleTemperature += Mathf.Min(incrementValue, printer.targetNozzleTemperature - printer.currentNozzleTemperature);
+                }
+            }
+            else
+            {
+                if (printer.currentNozzleTemperature > printer.initialNozzleTemperature)
+                {
+                    printer.currentNozzleTemperature -= Mathf.Min(incrementValue, printer.currentNozzleTemperature - printer.initialNozzleTemperature);
+                }
             }
 
-            // Increment current bed temperature towards target bed temperature
-            if (printer.currentBedTemperature < printer.targetBedTemperature)
+            if (!isBedCoolingDown)
             {
-                printer.currentBedTemperature += Mathf.Min(incrementValue, printer.targetBedTemperature - printer.currentBedTemperature);
+                // Increment current bed temperature towards target bed temperature
+                if (printer.currentBedTemperature < printer.targetBedTemperature)
+                {
+                    printer.currentBedTemperature += Mathf.Min(incrementValue, printer.targetBedTemperature - printer.currentBedTemperature);
+                }
             }
-
+            else
+            {
+                if (printer.currentBedTemperature > printer.initialBedTemperature)
+                {
+                    printer.currentBedTemperature -= Mathf.Min(incrementValue, printer.currentBedTemperature - printer.initialBedTemperature);
+                }
+            }
             // Update the temperature UI to reflect the new values
             UpdateTemperatureUI();
 
@@ -191,33 +215,103 @@ public class PrinterUI : MonoBehaviour
 
         }
     }
+    private IEnumerator LerpToHome(string axis)
+    {
+        float duration = 2f; // Duration of the animation of the 3D printer to move
+        float timeElapsed = 0f;
+
+        float startValue = GetAxisValue(printer.nozzlePosition, axis);
+        float targetValue = GetAxisValue(printer.homePosition, axis);
+
+        while (timeElapsed < duration)
+        {
+            // Lerp the value based on the elapsed time
+            SetAxisValue(ref printer.nozzlePosition, axis, Mathf.Lerp(startValue, targetValue, timeElapsed / duration));
+
+            // Update the UI to reflect the current nozzle position
+            UpdateNozzlePositionUI();
+
+            // Increase the elapsed time
+            timeElapsed += Time.deltaTime;
+
+            // Wait until the next frame
+            yield return null;
+        }
+
+        // Ensure the final position is exactly the home position
+        SetAxisValue(ref printer.nozzlePosition, axis, targetValue);
+        UpdateNozzlePositionUI();
+    }
+
+    private float GetAxisValue(Vector3 position, string axis)
+    {
+        switch (axis.ToLower())
+        {
+            case "x": return position.x;
+            case "y": return position.y;
+            case "z": return position.z;
+            default: throw new System.ArgumentException("Invalid axis");
+        }
+    }
+
+    private void SetAxisValue(ref Vector3 position, string axis, float value)
+    {
+        switch (axis.ToLower())
+        {
+            case "x": position.x = value; break;
+            case "y": position.y = value; break;
+            case "z": position.z = value; break;
+            default: throw new System.ArgumentException("Invalid axis");
+        }
+    }
+
     // Methods called by the buttons in UI
     public void IncreaseBedTemperature()
     {
         printer.targetBedTemperature += printer.incrementTemperature;
         if (printer.targetBedTemperature > 150) printer.targetBedTemperature = 150;
+        //initialBedTemperature = printer.currentBedTemperature;
+        isBedCoolingDown = false;
         UpdateTemperatureUI();
     }
     public void DecreaseBedTemperature()
     {
         printer.targetBedTemperature -= printer.incrementTemperature;
         if (printer.targetBedTemperature < 0) printer.targetBedTemperature = 0;
+        isBedCoolingDown = false;
         UpdateTemperatureUI();
     }
+    public void CooldownBedTemperature()
+    {
+        printer.targetBedTemperature = 0;
+        isBedCoolingDown = true;
+        UpdateTemperatureUI();
+    }
+
 
     public void IncreaseNozzleTemperature()
     {
         printer.targetNozzleTemperature += printer.incrementTemperature;
         if (printer.targetNozzleTemperature > 275) printer.targetNozzleTemperature = 275;
+        //initialNozzleTemperature = printer.currentNozzleTemperature;
+        isNozzleCoolingDown = false;
         UpdateTemperatureUI();
     }
     public void DecreaseNozzleTemperature()
     {
         printer.targetNozzleTemperature -= printer.incrementTemperature;
         if (printer.targetNozzleTemperature < 0) printer.targetNozzleTemperature = 0;
+        isNozzleCoolingDown = false;
         UpdateTemperatureUI();
     }
 
+    public void CooldownNozzleTemperature()
+    {
+       
+        printer.targetNozzleTemperature = 0;
+        isNozzleCoolingDown = true;
+        UpdateTemperatureUI();
+    }
     public void IncreaseExtrudedMaterial()
     {
         printer.extrudedValue += printer.incrementExtrusion;
@@ -287,53 +381,5 @@ public class PrinterUI : MonoBehaviour
         StartCoroutine(LerpToHome("z"));
     }
 
-    private IEnumerator LerpToHome(string axis)
-    {
-        float duration = 2f; // Duration of the animation of the 3D printer to move
-        float timeElapsed = 0f;
-
-        float startValue = GetAxisValue(printer.nozzlePosition, axis);
-        float targetValue = GetAxisValue(printer.homePosition, axis);
-
-        while (timeElapsed < duration)
-        {
-            // Lerp the value based on the elapsed time
-            SetAxisValue(ref printer.nozzlePosition, axis, Mathf.Lerp(startValue, targetValue, timeElapsed / duration));
-
-            // Update the UI to reflect the current nozzle position
-            UpdateNozzlePositionUI();
-
-            // Increase the elapsed time
-            timeElapsed += Time.deltaTime;
-
-            // Wait until the next frame
-            yield return null;
-        }
-
-        // Ensure the final position is exactly the home position
-        SetAxisValue(ref printer.nozzlePosition, axis, targetValue);
-        UpdateNozzlePositionUI();
-    }
-
-    private float GetAxisValue(Vector3 position, string axis)
-    {
-        switch (axis.ToLower())
-        {
-            case "x": return position.x;
-            case "y": return position.y;
-            case "z": return position.z;
-            default: throw new System.ArgumentException("Invalid axis");
-        }
-    }
-
-    private void SetAxisValue(ref Vector3 position, string axis, float value)
-    {
-        switch (axis.ToLower())
-        {
-            case "x": position.x = value; break;
-            case "y": position.y = value; break;
-            case "z": position.z = value; break;
-            default: throw new System.ArgumentException("Invalid axis");
-        }
-    }
+    
 }

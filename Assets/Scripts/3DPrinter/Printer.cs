@@ -12,8 +12,12 @@ public class Printer
     // Temperature
     public int currentNozzleTemperature;
     public int targetNozzleTemperature;
+    public int initialNozzleTemperature;
+
     public int currentBedTemperature;
     public int targetBedTemperature;
+    public int initialBedTemperature;
+
     public int incrementTemperature; 
     
     // Position
@@ -32,8 +36,10 @@ public class Printer
     public Printer()
     {
         currentNozzleTemperature = 32;
+        initialNozzleTemperature = 32;
         targetNozzleTemperature = 0;
         currentBedTemperature = 35;
+        initialBedTemperature = 35;
         targetBedTemperature = 0;
         incrementTemperature = 10;
 
