@@ -5055,7 +5055,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 2147483647
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &566259503428046875
 RectTransform:
   m_ObjectHideFlags: 0
@@ -13995,6 +13995,11 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: WelcomeCanvas
+      objectReference: {fileID: 0}
+    - target: {fileID: 3387656982002642892, guid: c918d7ef76d665d4ca3d348e0ab7317c,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 5970823502335372454, guid: c918d7ef76d665d4ca3d348e0ab7317c,
         type: 3}

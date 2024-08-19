@@ -1,11 +1,10 @@
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using static UnityEngine.Rendering.DebugUI;
 
 public class PrinterUI : MonoBehaviour
 {
+    [SerializeField] private Printer_SO printerSo;
     private Printer printer;
 
     private Temperature[] temperatures;
@@ -16,15 +15,19 @@ public class PrinterUI : MonoBehaviour
     private float updateInterval = 2f; // Time in seconds between updates
     private int incrementValue = 5; // temperature increment
 
-    // bools  for the quest system
+    // bools for the quest system
     private bool heatLevelEventInvoked = false;
     private bool materialEventInvoked = false;
     private bool homeEventInvoked = false;
 
     // variables for cooling down temperature 
-
     private bool isBedCoolingDown = false;
     private bool isNozzleCoolingDown = false;
+
+    // bools for tracking the movement of the axis
+    private bool isMovingOnX = false;
+    private bool isMovingOnY = false;
+    private bool isMovingOnZ = false;
 
     private void Awake()
     {
@@ -41,7 +44,7 @@ public class PrinterUI : MonoBehaviour
         if (IncrementExists())
         {
             Increment.onIncrementChanged += ChangeIncrement;
-            //Debug.Log("Subscribed to Increment.onIncrementChanged");
+            // Debug.Log("Subscribed to Increment.onIncrementChanged");
         }
         StartCoroutine(UpdateTemperaturesRoutine());
     }
@@ -51,7 +54,7 @@ public class PrinterUI : MonoBehaviour
         if (IncrementExists())
         {
             Increment.onIncrementChanged -= ChangeIncrement;
-            //Debug.Log("Unsubscribed from Increment.onIncrementChanged");
+            // Debug.Log("Unsubscribed from Increment.onIncrementChanged");
         }
         StopCoroutine(UpdateTemperaturesRoutine());
     }
@@ -63,24 +66,23 @@ public class PrinterUI : MonoBehaviour
 
     private void ChangeIncrement(IncrementType type, float value)
     {
-        
         if (type == IncrementType.TEMPERATURE)
         {
-            printer.incrementTemperature = (int) value;
+            printer.incrementTemperature = (int)value;
             InitializeIncrements();
-            Debug.Log("Printer increment: " + printer.incrementTemperature);
+            //Debug.Log("Printer increment: " + printer.incrementTemperature);
         }
         if (type == IncrementType.EXTRUDED_MATERIAL)
         {
             printer.incrementExtrusion = value;
             InitializeIncrements();
-            Debug.Log("Printer increment: " + printer.incrementExtrusion);
+            //Debug.Log("Printer increment: " + printer.incrementExtrusion);
         }
         if (type == IncrementType.POSITION)
         {
             printer.incrementPosition = value;
             InitializeIncrements();
-            Debug.Log("Printer increment: " + printer.incrementPosition);
+            //Debug.Log("Printer increment: " + printer.incrementPosition);
         }
     }
 
@@ -100,7 +102,7 @@ public class PrinterUI : MonoBehaviour
         HomeQuest();
     }
 
-    // Events for the quest System
+    // Events for the quest system
     private void HeatingQuest()
     {
         if (printer.currentBedTemperature == 50 && printer.currentNozzleTemperature == 50 && !heatLevelEventInvoked)
@@ -126,12 +128,11 @@ public class PrinterUI : MonoBehaviour
         }
     }
 
-
-
     private void UpdateExtrudedMaterialUI(float value)
     {
         extrudedMaterial.UpdateText(value.ToString("F2"));
     }
+
     private void UpdateTemperatureUI()
     {
         if (temperatures.Length == 0) return;
@@ -143,8 +144,8 @@ public class PrinterUI : MonoBehaviour
             else
                 temperature.UpdateText($"{printer.currentBedTemperature} / {printer.targetBedTemperature}");
         }
-  
     }
+
     private void UpdateNozzlePositionUI()
     {
         if (positions.Length == 0) return;
@@ -211,58 +212,106 @@ public class PrinterUI : MonoBehaviour
             // Wait for the specified interval before updating again
             yield return new WaitForSeconds(updateInterval);
 
-            // Add here decrease in the temperature when a certain button has been clicked , same logic
-
+            // Add here decrease in the temperature when a certain button has been clicked, same logic
         }
     }
-    private IEnumerator LerpToHome(string axis)
+    private IEnumerator moveNozzlePosition(Axis axis, float startValue, float endValue)
     {
-        float duration = 2f; // Duration of the animation of the 3D printer to move
         float timeElapsed = 0f;
-
-        float startValue = GetAxisValue(printer.nozzlePosition, axis);
-        float targetValue = GetAxisValue(printer.homePosition, axis);
-
-        while (timeElapsed < duration)
+        while (timeElapsed < printerSo.moveDuration)
         {
-            // Lerp the value based on the elapsed time
-            SetAxisValue(ref printer.nozzlePosition, axis, Mathf.Lerp(startValue, targetValue, timeElapsed / duration));
+            SetAxisValue(ref printer.nozzlePosition, axis, Mathf.Lerp(startValue, endValue, timeElapsed / printerSo.moveDuration));
 
-            // Update the UI to reflect the current nozzle position
-            UpdateNozzlePositionUI();
-
-            // Increase the elapsed time
             timeElapsed += Time.deltaTime;
 
-            // Wait until the next frame
+            UpdateNozzlePositionUI();
             yield return null;
         }
 
-        // Ensure the final position is exactly the home position
-        SetAxisValue(ref printer.nozzlePosition, axis, targetValue);
+        SetAxisValue(ref printer.nozzlePosition, axis, endValue);
         UpdateNozzlePositionUI();
     }
-
-    private float GetAxisValue(Vector3 position, string axis)
+    private float GetAxisValue(Vector3 position, Axis axis)
     {
-        switch (axis.ToLower())
+        switch (axis)
         {
-            case "x": return position.x;
-            case "y": return position.y;
-            case "z": return position.z;
-            default: throw new System.ArgumentException("Invalid axis");
+            case Axis.X: return position.x;
+            case Axis.Y: return position.y;
+            case Axis.Z: return position.z;
+            default: throw new ArgumentException("Invalid axis");
         }
     }
 
-    private void SetAxisValue(ref Vector3 position, string axis, float value)
+    private void SetAxisValue(ref Vector3 position, Axis axis, float value)
     {
-        switch (axis.ToLower())
+        switch (axis)
         {
-            case "x": position.x = value; break;
-            case "y": position.y = value; break;
-            case "z": position.z = value; break;
-            default: throw new System.ArgumentException("Invalid axis");
+            case Axis.X: position.x = value; break;
+            case Axis.Y: position.y = value; break;
+            case Axis.Z: position.z = value; break;
+            default: throw new ArgumentException("Invalid axis");
         }
+    }
+    private IEnumerator ReturnHomeSequence()
+    {
+        // Move Y axis home
+        yield return StartCoroutine(ReturnYHomeSequence());
+
+        // Move X axis home
+        yield return StartCoroutine(ReturnXHomeSequence());
+
+        // Move Z axis home
+        yield return StartCoroutine(ReturnZHomeSequence());
+    }
+    private IEnumerator ReturnYHomeSequence()
+    {
+        if (isMovingOnY) yield break;
+
+        isMovingOnY = true;
+        float startValue = GetAxisValue(printer.nozzlePosition, Axis.Y);
+        float endValue = printer.homePosition.y;
+
+        printerSo.Move(Axis.Z, endValue - startValue);
+        // add position limit based on the 3D printer
+        yield return StartCoroutine(moveNozzlePosition(Axis.Y, startValue, endValue));
+        isMovingOnY = false;
+    }
+
+    private IEnumerator ReturnXHomeSequence()
+    {
+        if (isMovingOnX) yield break;
+
+        isMovingOnX = true;
+        float startValue = GetAxisValue(printer.nozzlePosition, Axis.X);
+        float endValue = printer.homePosition.x;
+
+        printerSo.Move(Axis.X, endValue - startValue);
+        // add position limit based on the 3D printer
+        yield return StartCoroutine(moveNozzlePosition(Axis.X, startValue, endValue));
+        isMovingOnX = false;
+    }
+
+    private IEnumerator ReturnZHomeSequence()
+    {
+        if (isMovingOnZ) yield break;
+
+        isMovingOnZ = true;
+        float startValue = GetAxisValue(printer.nozzlePosition, Axis.Z);
+        float endValue = printer.homePosition.z;
+
+        printerSo.Move(Axis.Y, endValue - startValue);
+        // add position limit based on the 3D printer
+        yield return StartCoroutine(moveNozzlePosition(Axis.Z, startValue, endValue));
+        isMovingOnZ = false;
+    }
+    private IEnumerator ResetBool(bool value)
+    {
+        //Debug.Log("Reset");
+        yield return new WaitForSeconds(printerSo.moveDuration);
+        if (value == isMovingOnX) isMovingOnX = false;
+        else if (value == isMovingOnY) isMovingOnY = false;
+        else isMovingOnZ = false;
+
     }
 
     // Methods called by the buttons in UI
@@ -270,10 +319,10 @@ public class PrinterUI : MonoBehaviour
     {
         printer.targetBedTemperature += printer.incrementTemperature;
         if (printer.targetBedTemperature > 150) printer.targetBedTemperature = 150;
-        //initialBedTemperature = printer.currentBedTemperature;
         isBedCoolingDown = false;
         UpdateTemperatureUI();
     }
+
     public void DecreaseBedTemperature()
     {
         printer.targetBedTemperature -= printer.incrementTemperature;
@@ -281,6 +330,7 @@ public class PrinterUI : MonoBehaviour
         isBedCoolingDown = false;
         UpdateTemperatureUI();
     }
+
     public void CooldownBedTemperature()
     {
         printer.targetBedTemperature = 0;
@@ -288,15 +338,14 @@ public class PrinterUI : MonoBehaviour
         UpdateTemperatureUI();
     }
 
-
     public void IncreaseNozzleTemperature()
     {
         printer.targetNozzleTemperature += printer.incrementTemperature;
         if (printer.targetNozzleTemperature > 275) printer.targetNozzleTemperature = 275;
-        //initialNozzleTemperature = printer.currentNozzleTemperature;
         isNozzleCoolingDown = false;
         UpdateTemperatureUI();
     }
+
     public void DecreaseNozzleTemperature()
     {
         printer.targetNozzleTemperature -= printer.incrementTemperature;
@@ -307,79 +356,162 @@ public class PrinterUI : MonoBehaviour
 
     public void CooldownNozzleTemperature()
     {
-       
         printer.targetNozzleTemperature = 0;
         isNozzleCoolingDown = true;
         UpdateTemperatureUI();
     }
+
     public void IncreaseExtrudedMaterial()
     {
         printer.extrudedValue += printer.incrementExtrusion;
         if (printer.extrudedValue > 30f) printer.extrudedValue = 30f;
         UpdateExtrudedMaterialUI(printer.extrudedValue);
-        
     }
+
     public void DecreaseExtrudedMaterial()
     {
         printer.extrudedValue -= printer.incrementExtrusion;
-        if (printer.extrudedValue < -10f) printer.extrudedValue = -10f;
+        if (printer.extrudedValue < 0f) printer.extrudedValue = 0f;
         UpdateExtrudedMaterialUI(printer.extrudedValue);
     }
 
     public void IncreaseXPosition()
     {
-        printer.nozzlePosition.x += printer.incrementPosition;
-        // add position limit based on the 3D printer
-        UpdateNozzlePositionUI();
+        //Debug.Log("test");
+        if (printerSo != null)
+        {
+            if (isMovingOnX) return;
+            //Debug.Log("test inside");
+            isMovingOnX = true;
+            float startValue = GetAxisValue(printer.nozzlePosition, Axis.X);
+            float endValue = GetAxisValue(printer.nozzlePosition, Axis.X) + printer.incrementPosition;
+            // add position limit based on the 3D printer
+            if (endValue > 400f) endValue = 400f;
+
+            float incrementValue = MathF.Abs(endValue - startValue);
+            float sign = endValue - startValue < 0 ? -1 : 1;
+            printerSo.Move(Axis.X, sign * incrementValue); // Move value
+            StartCoroutine(moveNozzlePosition(Axis.X, startValue, endValue));
+            StartCoroutine(ResetBool(isMovingOnX));
+        }
     }
+
     public void IncreaseYPosition()
     {
-        printer.nozzlePosition.y += printer.incrementPosition;
-        // add position limit based on the 3D printer
-        UpdateNozzlePositionUI();
+        if (printerSo != null)
+        {
+            if (isMovingOnY) return;
+
+            isMovingOnY = true;
+            float startValue = GetAxisValue(printer.nozzlePosition, Axis.Y);
+            float endValue = GetAxisValue(printer.nozzlePosition, Axis.Y) + printer.incrementPosition;
+            if (endValue > 550f) endValue = 550f;
+            float incrementValue = MathF.Abs(endValue - startValue);
+            float sign = endValue - startValue < 0 ? -1 : 1;
+
+
+            printerSo.Move(Axis.Z, sign * incrementValue); // Move value
+            StartCoroutine(moveNozzlePosition(Axis.Y, startValue, endValue));
+
+            // add position limit based on the 3D printer
+            StartCoroutine(ResetBool(isMovingOnY));
+        }
     }
     public void IncreaseZPosition()
     {
-        printer.nozzlePosition.z += printer.incrementPosition;
-        // add position limit based on the 3D printer
-        UpdateNozzlePositionUI();
+        if (printerSo != null)
+        {
+            if (isMovingOnZ) return;
+
+            isMovingOnZ = true;
+            float startValue = GetAxisValue(printer.nozzlePosition, Axis.Z);
+            float endValue = GetAxisValue(printer.nozzlePosition, Axis.Z) + printer.incrementPosition;
+            if (endValue > 810f) endValue = 810f;
+            float incrementValue = MathF.Abs(endValue - startValue);
+            float sign = endValue - startValue < 0 ? -1 : 1;
+
+            printerSo.Move(Axis.Y, sign * incrementValue); // Move value
+            StartCoroutine(moveNozzlePosition(Axis.Z, startValue, endValue));
+
+            // add position limit based on the 3D printer
+            StartCoroutine(ResetBool(isMovingOnZ));
+        }
     }
     public void DecreaseXPosition()
     {
-        printer.nozzlePosition.x -= printer.incrementPosition;
-        // add position limit based on the 3D printer
-        UpdateNozzlePositionUI();
+        if (printerSo != null)
+        {
+            if (isMovingOnX) return;
+
+            isMovingOnX = true;
+            float startValue = GetAxisValue(printer.nozzlePosition, Axis.X);
+            float endValue = GetAxisValue(printer.nozzlePosition, Axis.X) - printer.incrementPosition;
+            if (endValue < -320f) endValue = -320f;
+            float incrementValue = MathF.Abs(endValue - startValue);
+            float sign = endValue - startValue < 0 ? -1 : 1;
+
+            printerSo.Move(Axis.X, sign * incrementValue); // Move value
+            StartCoroutine(moveNozzlePosition(Axis.X, startValue, endValue));
+
+            // add position limit based on the 3D printer
+            StartCoroutine(ResetBool(isMovingOnX));
+        }
     }
     public void DecreaseYPosition()
     {
-        printer.nozzlePosition.y -= printer.incrementPosition;
-        // add position limit based on the 3D printer
-        UpdateNozzlePositionUI();
+        if (printerSo != null)
+        {
+            if (isMovingOnY) return;
+
+            isMovingOnY = true;
+            float startValue = GetAxisValue(printer.nozzlePosition, Axis.Y);
+            float endValue = GetAxisValue(printer.nozzlePosition, Axis.Y) - printer.incrementPosition;
+            if (endValue < -350f) endValue = -350f;
+            float incrementValue = MathF.Abs(endValue - startValue);
+            float sign = endValue - startValue < 0 ? -1 : 1;
+
+            printerSo.Move(Axis.Z, sign * incrementValue); // Move value
+            StartCoroutine(moveNozzlePosition(Axis.Y, startValue, endValue));
+
+            // add position limit based on the 3D printer
+            StartCoroutine(ResetBool(isMovingOnY));
+        }
     }
     public void DecreaseZPosition()
     {
-        printer.nozzlePosition.z -= printer.incrementPosition;
-        // add position limit based on the 3D printer
-        UpdateNozzlePositionUI();
+        if (printerSo != null)
+        {
+            if (isMovingOnZ) return;
+
+            isMovingOnZ = true;
+            float startValue = GetAxisValue(printer.nozzlePosition, Axis.Z);
+            float endValue = GetAxisValue(printer.nozzlePosition, Axis.Z) - printer.incrementPosition;
+            if (endValue < -203f) endValue = -203f;
+            float incrementValue = MathF.Abs(endValue - startValue);
+            float sign = endValue - startValue < 0 ? -1 : 1;
+            
+            printerSo.Move(Axis.Y, sign * incrementValue); // Move value
+            StartCoroutine(moveNozzlePosition(Axis.Z, startValue, endValue));
+
+            // add position limit based on the 3D printer
+            StartCoroutine(ResetBool(isMovingOnZ));
+        }
     }
     public void ReturnHome()
     {
-        StartCoroutine(LerpToHome("x"));
-        StartCoroutine(LerpToHome("y"));
-        StartCoroutine(LerpToHome("z"));
+        if (printerSo != null) StartCoroutine(ReturnHomeSequence());
     }
+
     public void ReturnXHome()
     {
-        StartCoroutine(LerpToHome("x"));
+        if (printerSo != null) StartCoroutine(ReturnXHomeSequence());
     }
     public void ReturnYHome()
     {
-        StartCoroutine(LerpToHome("y"));
+        if (printerSo != null) StartCoroutine(ReturnYHomeSequence());
     }
     public void ReturnZHome()
     {
-        StartCoroutine(LerpToHome("z"));
+        if (printerSo != null) StartCoroutine(ReturnZHomeSequence());
     }
-
-    
 }
