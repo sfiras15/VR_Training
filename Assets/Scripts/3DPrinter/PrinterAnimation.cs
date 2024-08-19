@@ -16,6 +16,8 @@ public class PrinterAnimation : MonoBehaviour
 
     [SerializeField] private Printer_SO  printerSo;
 
+ 
+
     private void OnEnable()
     {
         if (printerSo != null) printerSo.onMove += MoveGameObject;

@@ -46,7 +46,7 @@ public class Printer
         // For the position Add a function that reads and initiates the value from the printer model 's position in the editor on start up
         nozzlePosition = new Vector3(0,0f,-200f);// check z value later
         homePosition = new Vector3(0f, 0f, -200f); // this is just an example check real values with the 3d printer model 
-        incrementPosition = 0.1f;
+        incrementPosition = 1f;
 
         probeOffset = 0f;
 

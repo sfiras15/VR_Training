@@ -43,7 +43,7 @@ public class Increment : MonoBehaviour
                     break;
             }
 
-            Debug.Log($"Invoking onIncrementChanged with type: {type} and newValue: {newValue}");
+            //Debug.Log($"Invoking onIncrementChanged with type: {type} and newValue: {newValue}");
             onIncrementChanged?.Invoke(type, newValue);
         }
         else if (type == IncrementType.EXTRUDED_MATERIAL)
@@ -68,7 +68,7 @@ public class Increment : MonoBehaviour
                     break;
             }
 
-            Debug.Log($"Invoking onIncrementChanged with type: {type} and newValue: {newValue}");
+            //Debug.Log($"Invoking onIncrementChanged with type: {type} and newValue: {newValue}");
             onIncrementChanged?.Invoke(type, newValue);
         }
         else if (type == IncrementType.POSITION)
@@ -77,21 +77,21 @@ public class Increment : MonoBehaviour
             float newValue;
             switch (currentValue)
             {
-                case 0.1f:
+                case 1f:
                     newValue = 10f;
                     break;
                 case 10f:
                     newValue = 100f;
                     break;
                 case 100f:
-                    newValue = 0.1f;
+                    newValue = 1f;
                     break;
                 default:
-                    newValue = 0.1f;
+                    newValue = 1f;
                     break;
             }
 
-            Debug.Log($"Invoking onIncrementChanged with type: {type} and newValue: {newValue}");
+            //Debug.Log($"Invoking onIncrementChanged with type: {type} and newValue: {newValue}");
             onIncrementChanged?.Invoke(type, newValue);
         }
 

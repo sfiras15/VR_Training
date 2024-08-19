@@ -1,4 +1,4 @@
-Shader "Custom/UsingStencil"
+Shader "Custom/PrintedObjectShader"
 {
     Properties
     {
@@ -14,7 +14,8 @@ Shader "Custom/UsingStencil"
             Stencil
             {
                 Ref 1
-                Comp equal    // Only render where the stencil value is equal to 1
+                Comp Equal      // Render where stencil buffer equals 1
+                Pass Replace    // Replace the stencil value with 1
             }
 
             HLSLPROGRAM
@@ -48,4 +49,5 @@ Shader "Custom/UsingStencil"
             ENDHLSL
         }
     }
+    FallBack "Universal Forward"
 }

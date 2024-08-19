@@ -1,4 +1,4 @@
-Shader "Custom/URPStencilSetBottom"
+Shader "Custom/VisualizerObjectShader"
 {
     Properties
     {
@@ -14,9 +14,9 @@ Shader "Custom/URPStencilSetBottom"
             ZWrite Off
             Stencil
             {
-                Ref 1                  // Reference value
-                Comp always            // Always pass stencil test
-                Pass replace           // Replace stencil buffer value with Ref
+                Ref 1                  // Reference value for the stencil buffer
+                Comp Always            // Always pass stencil test
+                Pass Replace           // Replace stencil buffer value with Ref
             }
 
             HLSLPROGRAM
@@ -40,26 +40,24 @@ Shader "Custom/URPStencilSetBottom"
             Varyings vert (Attributes v)
             {
                 Varyings o;
-                // Make sure to use the correct float4 type
-                float4 positionOS = float4(v.positionOS.xyz, 1.0);
-                o.positionHCS = TransformObjectToHClip(positionOS); // Explicitly use a float4 vector
-                o.worldPos = TransformObjectToWorld(positionOS).xyz; // Use .xyz to extract the float3
+                o.positionHCS = TransformObjectToHClip(v.positionOS);
+                o.worldPos = TransformObjectToWorld(v.positionOS).xyz;
                 return o;
             }
 
             half4 frag (Varyings i) : SV_Target
             {
-                // Only write to stencil if the fragment is below the cutoff height
                 if (i.worldPos.y < _CutoffHeight)
                 {
-                    return half4(1, 1, 1, 1);  // Color doesn't matter
+                    return half4(1, 1, 1, 1);
                 }
                 else
                 {
-                    return half4(0, 0, 0, 0);  // Return black if discarded
+                    return half4(0, 0, 0, 0);
                 }
             }
             ENDHLSL
         }
     }
+    FallBack "Universal Forward"
 }
