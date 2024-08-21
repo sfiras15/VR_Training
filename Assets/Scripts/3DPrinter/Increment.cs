@@ -6,7 +6,8 @@ public enum IncrementType
 {
     TEMPERATURE,
     EXTRUDED_MATERIAL,
-    POSITION
+    POSITION,
+    BABYSTEP
     // add the other increment types later
 }
 
@@ -88,6 +89,29 @@ public class Increment : MonoBehaviour
                     break;
                 default:
                     newValue = 1f;
+                    break;
+            }
+
+            //Debug.Log($"Invoking onIncrementChanged with type: {type} and newValue: {newValue}");
+            onIncrementChanged?.Invoke(type, newValue);
+        }
+        else
+        {
+            float currentValue = float.Parse(textUI.text);
+            float newValue;
+            switch (currentValue)
+            {
+                case 0.01f:
+                    newValue = 0.1f;
+                    break;
+                case 0.1f:
+                    newValue = 1f;
+                    break;
+                case 1f:
+                    newValue = 0.01f;
+                    break;
+                default:
+                    newValue = 0.01f;
                     break;
             }
 
