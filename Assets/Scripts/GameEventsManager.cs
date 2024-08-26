@@ -22,17 +22,29 @@ public class GameEventsManager : MonoBehaviour
         mainLevelQuests = new MainLevelQuests();
     }
     // Main level Events
+    public void MaterialLoadingEventOccurred()
+    {
+        mainLevelQuests.MaterialLoaded();
+    }
     public void HeatEventOccurred()
     {
         mainLevelQuests.HeatLevelAchieved();
     }
-    public void MaterialEventOccurred()
+    public void MaterialExtrusionEventOccurred()
     {
         mainLevelQuests.MaterialExtruded();
     }
     public void HomeEventOccurred()
     {
         mainLevelQuests.HomePositionAchieved();
+    }
+    public void PrintEventOccurred()
+    {
+        mainLevelQuests.PrintStarted();
+    }
+    public void BabyStepEventOccurred()
+    {
+        mainLevelQuests.BabyStepLevelAchieved();
     }
 
 

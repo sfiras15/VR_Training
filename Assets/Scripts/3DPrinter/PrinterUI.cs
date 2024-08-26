@@ -133,7 +133,7 @@ public class PrinterUI : MonoBehaviour
         if (printer.extrudedValue >= 20 && !materialEventInvoked)
         {
             materialEventInvoked = true;
-            GameEventsManager.instance.MaterialEventOccurred();
+            GameEventsManager.instance.MaterialExtrusionEventOccurred();
         }
     }
     private void HomeQuest()
@@ -547,6 +547,8 @@ public class PrinterUI : MonoBehaviour
     {
         printer.probeOffset += printer.currentBabyStep;
         printer.currentBabyStep = 0;
+        // Add a condition here that checks the right thickness of the material before triggering the event
+        GameEventsManager.instance.mainLevelQuests.BabyStepLevelAchieved();
         UpdateBabyStepUI();
     }
     // Used on the reset button and the back button of the BabyStep menu
@@ -576,6 +578,7 @@ public class PrinterUI : MonoBehaviour
     public void Print()
     {
         StartCoroutine(PrintSequence());
+        GameEventsManager.instance.PrintEventOccurred();
     }
     // The sequence movement is based on the 3D printer in real life
     private IEnumerator PrintSequence()
@@ -665,7 +668,9 @@ public class PrinterUI : MonoBehaviour
         yield return StartCoroutine(MoveToDestination(printer.nozzlePosition.z, -200f, Axis.Z, isMovingOnZ, 0.5f)); // from here on out add the Probe offset value on the Z axis
 
         // start ejecting material
-
+        // Add a pause so for the UI to explain babySteps and then go back to ejecting materials
+        isMovingOnX = true;
+        yield return StartCoroutine(MoveToDestination(printer.nozzlePosition.x, -280f, Axis.X, isMovingOnX, 15f)); // from here on out add the Probe offset value on the Z axis
     }
 
 }
