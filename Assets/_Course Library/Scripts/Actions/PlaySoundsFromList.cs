@@ -20,7 +20,11 @@ public class PlaySoundsFromList : MonoBehaviour
     {
         audioSource = GetComponent<AudioSource>();
     }
-
+    public void PlaySound()
+    {
+        PlayClip();
+        index = ++index % audioClips.Count;
+    }
     public void NextClip()
     {
         index = ++index % audioClips.Count;
