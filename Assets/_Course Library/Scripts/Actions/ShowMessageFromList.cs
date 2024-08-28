@@ -22,11 +22,23 @@ public class ShowMessageFromList : MonoBehaviour
 
     private bool isClicked = false;
 
-    private void Start()
+    [Header("For Dialogue Options")]
+    // With some testing these values give the best result
+    [Tooltip("The maximum length of characters that can be shown at once")]
+    [SerializeField] private int maxLengthPerMessage = 175;
+
+    [Tooltip("The delay between showing parts of a message")]
+    [SerializeField] private float messageDelay = 10.5f;
+
+    private void OnEnable()
     {
-        //ShowMessage();
+        if (GameEventsManager.instance != null) GameEventsManager.instance.mainLevelQuests.onMessageRead += ShowMessageWithParts;
     }
 
+    private void OnDisable()
+    {
+        if (GameEventsManager.instance != null) GameEventsManager.instance.mainLevelQuests.onMessageRead -= ShowMessageWithParts;
+    }
     public void NextMessage()
     {
         int newIndex = ++index % messages.Count;
@@ -88,4 +100,52 @@ public class ShowMessageFromList : MonoBehaviour
         index = value;
         ShowMessage();
     }
+    // New method to show a message with parts
+    public void ShowMessageWithParts(int messageIndex)
+    {
+        StartCoroutine(DisplayMessageWithParts(messageIndex));
+    }
+
+    private IEnumerator DisplayMessageWithParts(int messageIndex)
+    {
+        if (messageIndex < 0 || messageIndex >= messages.Count)
+        {
+            yield break; // Invalid index, exit the coroutine
+        }
+
+        string message = messages[messageIndex];
+        int totalLength = message.Length;
+        int currentIndex = 0;
+
+        while (currentIndex < totalLength)
+        {
+            // Determine the maximum length for this part
+            int length = Mathf.Min(maxLengthPerMessage, totalLength - currentIndex);
+
+            // Ensure we don't cut off in the middle of a word
+            if (currentIndex + length < totalLength && !char.IsWhiteSpace(message[currentIndex + length]))
+            {
+                // Move the length back to the last space
+                int lastSpace = message.LastIndexOf(' ', currentIndex + length);
+                if (lastSpace > currentIndex)
+                {
+                    length = lastSpace - currentIndex;
+                }
+            }
+
+            // Extract and show this part of the message
+            string partMessage = message.Substring(currentIndex, length).TrimStart(); // Trim leading whitespace
+            messageOutput.text = partMessage;
+
+            // Update the current index
+            currentIndex += length;
+
+            // Wait for the specified delay if there are more parts
+            if (currentIndex < totalLength)
+            {
+                yield return new WaitForSeconds(messageDelay);
+            }
+        }
+    }
+
 }

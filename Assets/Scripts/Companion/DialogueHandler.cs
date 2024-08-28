@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class DialogueHandler : MonoBehaviour
 {
-    [SerializeField] private PlaySoundsFromList soundHandler;
+    private PlaySoundsFromList soundHandler;
 
     private void Awake()
     {
@@ -12,17 +12,28 @@ public class DialogueHandler : MonoBehaviour
     }
     public void PlaySound()
     {
-        if (soundHandler != null) soundHandler.PlaySound();
-    }
-    // Start is called before the first frame update
-    void Start()
-    {
+        if (soundHandler != null) 
+        {
+            // this will show subtitles for the read message
+            GameEventsManager.instance.MessageEventOccurred(soundHandler.CurrentIndex);
+            soundHandler.PlaySound();
+
+            
+        }
+
         
     }
-
     // Update is called once per frame
     void Update()
     {
-        
+        // For testing only remove later
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            // this will show subtitles for the read message
+            GameEventsManager.instance.MessageEventOccurred(soundHandler.CurrentIndex);
+            soundHandler.PlaySound();
+
+            
+        }
     }
 }

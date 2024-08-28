@@ -4,10 +4,10 @@ using UnityEngine;
 public class MainLevelQuests
 {
     // Event for loading the material in the socket of the printer
-    public event Action onMaterialLoaded;
-    public void MaterialLoaded()
+    public event Action<bool> onMaterialLoaded;
+    public void MaterialLoaded(bool value)
     {
-        if (onMaterialLoaded != null) onMaterialLoaded();
+        if (onMaterialLoaded != null) onMaterialLoaded(value);
     }
 
     // Event for heating the bed / nozzle to the right temperature
@@ -44,5 +44,12 @@ public class MainLevelQuests
     public void BabyStepLevelAchieved()
     {
         if (onBabyStepLevelAchieved != null) onBabyStepLevelAchieved();
+    }
+
+    // Event for broadcasting the current read message by the companion
+    public event Action<int> onMessageRead;
+    public void MessageRead(int index)
+    {
+        if (onMessageRead != null) onMessageRead(index);
     }
 }

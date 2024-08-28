@@ -13,7 +13,7 @@ public class LoadMaterialQuestStep : QuestStep
         GameEventsManager.instance.mainLevelQuests.onMaterialLoaded -= MaterialLoadingAchieved;
     }
 
-    private void MaterialLoadingAchieved()
+    private void MaterialLoadingAchieved(bool value)
     {
         FinishQuestStep();
     }

@@ -7,6 +7,7 @@ using UnityEngine;
 public class PrinterUI : MonoBehaviour
 {
     [SerializeField] private Printer_SO printerSo;
+   
     private Printer printer;
 
     // Components found in the UI menus to update their info
@@ -20,9 +21,11 @@ public class PrinterUI : MonoBehaviour
     private int incrementValue = 5; // temperature increment
 
     // bools for the quest system
+    private bool materialLoadingEventInvoked = false;
     private bool heatLevelEventInvoked = false;
-    private bool materialEventInvoked = false;
+    private bool materialExtrusionEventInvoked = false;
     private bool homeEventInvoked = false;
+
 
     // variables for cooling down temperature 
     private bool isBedCoolingDown = false;
@@ -33,6 +36,17 @@ public class PrinterUI : MonoBehaviour
     private bool isMovingOnY = false;
     private bool isMovingOnZ = false;
 
+    // Warning Panel
+    private enum WarningMessages
+    {
+        MATERIAL_LOADING = 0,
+        HEAT = 1,
+        EXTRUSION = 2,
+        HOME = 3,
+       // The order matters because we are matching the index with the index of messages in the warning panel
+    }
+    private WarningPanel warningPanel;
+
     private void Awake()
     {
         // true to get even the inactive ones in hierarchy
@@ -42,6 +56,7 @@ public class PrinterUI : MonoBehaviour
         positions = GetComponentsInChildren<Position>(true);
         babySteps = GetComponentsInChildren<BabyStep>(true);
         printer = new Printer();
+        warningPanel = GetComponentInChildren<WarningPanel>(true);
     }
 
     private void OnEnable()
@@ -52,6 +67,7 @@ public class PrinterUI : MonoBehaviour
             // Debug.Log("Subscribed to Increment.onIncrementChanged");
         }
         StartCoroutine(UpdateTemperaturesRoutine());
+        if (GameEventsManager.instance != null) GameEventsManager.instance.mainLevelQuests.onMaterialLoaded += MaterialLoadingQuest;
     }
 
     private void OnDisable()
@@ -62,8 +78,13 @@ public class PrinterUI : MonoBehaviour
             // Debug.Log("Unsubscribed from Increment.onIncrementChanged");
         }
         StopCoroutine(UpdateTemperaturesRoutine());
+        if (GameEventsManager.instance != null) GameEventsManager.instance.mainLevelQuests.onMaterialLoaded -= MaterialLoadingQuest;
     }
 
+    private void MaterialLoadingQuest(bool value)
+    {
+        materialLoadingEventInvoked = value;
+    }
     private bool IncrementExists()
     {
         return FindObjectsOfType<Increment>(true).Length > 0;
@@ -122,19 +143,16 @@ public class PrinterUI : MonoBehaviour
     // Events for the quest system
     private void HeatingQuest()
     {
-        if (printer.currentBedTemperature == 50 && printer.currentNozzleTemperature == 50 && !heatLevelEventInvoked)
+        if ((printer.currentBedTemperature == 50 && printer.currentNozzleTemperature == 50) && !heatLevelEventInvoked)
         {
             heatLevelEventInvoked = true;
             GameEventsManager.instance.HeatEventOccurred();
         }
-    }
-    private void ExtrusionQuest()
-    {
-        if (printer.extrudedValue >= 20 && !materialEventInvoked)
+        else if ((printer.currentBedTemperature != 50 || printer.currentNozzleTemperature != 50) && heatLevelEventInvoked)
         {
-            materialEventInvoked = true;
-            GameEventsManager.instance.MaterialExtrusionEventOccurred();
+            heatLevelEventInvoked = false;
         }
+        
     }
     private void HomeQuest()
     {
@@ -143,7 +161,26 @@ public class PrinterUI : MonoBehaviour
             homeEventInvoked = true;
             GameEventsManager.instance.HomeEventOccurred();
         }
+        else if (printer.nozzlePosition != printer.homePosition && homeEventInvoked)
+        {
+            homeEventInvoked = false;
+        }
+        
     }
+    private void ExtrusionQuest()
+    {
+        if (printer.extrudedValue >= 10 && !materialExtrusionEventInvoked && heatLevelEventInvoked)
+        {
+            materialExtrusionEventInvoked = true;
+            GameEventsManager.instance.MaterialExtrusionEventOccurred();
+        }
+        else if (printer.extrudedValue < 10 && materialExtrusionEventInvoked)
+        {
+            materialExtrusionEventInvoked = false;
+        }
+        
+    }
+    
 
     private void UpdateExtrudedMaterialUI(float value)
     {
@@ -211,7 +248,11 @@ public class PrinterUI : MonoBehaviour
             }
             else
             {
-                if (printer.currentNozzleTemperature > printer.initialNozzleTemperature)
+                if (printer.currentNozzleTemperature > printer.targetNozzleTemperature && printer.targetNozzleTemperature > printer.initialNozzleTemperature)
+                {
+                    printer.currentNozzleTemperature -= Mathf.Min(incrementValue, printer.currentNozzleTemperature - printer.targetNozzleTemperature);
+                }
+                else
                 {
                     printer.currentNozzleTemperature -= Mathf.Min(incrementValue, printer.currentNozzleTemperature - printer.initialNozzleTemperature);
                 }
@@ -227,11 +268,17 @@ public class PrinterUI : MonoBehaviour
             }
             else
             {
-                if (printer.currentBedTemperature > printer.initialBedTemperature)
+                if (printer.currentBedTemperature > printer.targetBedTemperature && printer.targetBedTemperature > printer.initialBedTemperature)
+                {
+                    printer.currentBedTemperature -= Mathf.Min(incrementValue, printer.currentBedTemperature - printer.targetBedTemperature);
+                }
+                else
                 {
                     printer.currentBedTemperature -= Mathf.Min(incrementValue, printer.currentBedTemperature - printer.initialBedTemperature);
                 }
             }
+            if (printer.currentNozzleTemperature == printer.targetNozzleTemperature && isNozzleCoolingDown) isNozzleCoolingDown = false;
+            if (printer.currentBedTemperature == printer.targetBedTemperature && isBedCoolingDown) isBedCoolingDown = false;
             // Update the temperature UI to reflect the new values
             UpdateTemperatureUI();
 
@@ -258,17 +305,6 @@ public class PrinterUI : MonoBehaviour
         SetAxisValue(ref printer.nozzlePosition, axis, endValue);
         UpdateNozzlePositionUI();
     }
-    //private float GetAxisValue(Vector3 position, Axis axis)
-    //{
-    //    switch (axis)
-    //    {
-    //        case Axis.X: return position.x;
-    //        case Axis.Y: return position.y;
-    //        case Axis.Z: return position.z;
-    //        default: throw new ArgumentException("Invalid axis");
-    //    }
-    //}
-
     private void SetAxisValue(ref Vector3 position, Axis axis, float value)
     {
         switch (axis)
@@ -345,17 +381,26 @@ public class PrinterUI : MonoBehaviour
     // Methods called by the buttons in UI
     public void IncreaseBedTemperature()
     {
-        printer.targetBedTemperature += printer.incrementTemperature;
-        if (printer.targetBedTemperature > 150) printer.targetBedTemperature = 150;
-        isBedCoolingDown = false;
-        UpdateTemperatureUI();
+        if (materialLoadingEventInvoked)
+        {
+            printer.targetBedTemperature += printer.incrementTemperature;
+            if (printer.targetBedTemperature > 150) printer.targetBedTemperature = 150;
+            isBedCoolingDown = false;
+            UpdateTemperatureUI();
+        }
+        else
+        {
+            //Add error message
+            if (warningPanel != null) warningPanel.ShowWarning((int)WarningMessages.MATERIAL_LOADING);
+        }
+        
     }
 
     public void DecreaseBedTemperature()
     {
         printer.targetBedTemperature -= printer.incrementTemperature;
         if (printer.targetBedTemperature < 0) printer.targetBedTemperature = 0;
-        isBedCoolingDown = false;
+        isBedCoolingDown = true;
         UpdateTemperatureUI();
     }
 
@@ -368,17 +413,26 @@ public class PrinterUI : MonoBehaviour
 
     public void IncreaseNozzleTemperature()
     {
-        printer.targetNozzleTemperature += printer.incrementTemperature;
-        if (printer.targetNozzleTemperature > 275) printer.targetNozzleTemperature = 275;
-        isNozzleCoolingDown = false;
-        UpdateTemperatureUI();
+        if (materialLoadingEventInvoked)
+        {
+            printer.targetNozzleTemperature += printer.incrementTemperature;
+            if (printer.targetNozzleTemperature > 275) printer.targetNozzleTemperature = 275;
+            isNozzleCoolingDown = false;
+            UpdateTemperatureUI();
+        }
+        else
+        {
+            //Add error message
+            if (warningPanel != null) warningPanel.ShowWarning((int)WarningMessages.MATERIAL_LOADING);
+        }
     }
+       
 
     public void DecreaseNozzleTemperature()
     {
         printer.targetNozzleTemperature -= printer.incrementTemperature;
         if (printer.targetNozzleTemperature < 0) printer.targetNozzleTemperature = 0;
-        isNozzleCoolingDown = false;
+        isNozzleCoolingDown = true;
         UpdateTemperatureUI();
     }
 
@@ -391,16 +445,34 @@ public class PrinterUI : MonoBehaviour
 
     public void IncreaseExtrudedMaterial()
     {
-        printer.extrudedValue += printer.incrementExtrusion;
-        if (printer.extrudedValue > 30f) printer.extrudedValue = 30f;
-        UpdateExtrudedMaterialUI(printer.extrudedValue);
+        if (heatLevelEventInvoked)
+        {
+            printer.extrudedValue += printer.incrementExtrusion;
+            if (printer.extrudedValue > 30f) printer.extrudedValue = 30f;
+            UpdateExtrudedMaterialUI(printer.extrudedValue);
+        }
+        else
+        {
+            //Add error message
+            if (warningPanel != null) warningPanel.ShowWarning((int)WarningMessages.HEAT);
+        }
+        
     }
 
     public void DecreaseExtrudedMaterial()
     {
-        printer.extrudedValue -= printer.incrementExtrusion;
-        if (printer.extrudedValue < 0f) printer.extrudedValue = 0f;
-        UpdateExtrudedMaterialUI(printer.extrudedValue);
+        if (heatLevelEventInvoked)
+        {
+            printer.extrudedValue -= printer.incrementExtrusion;
+            if (printer.extrudedValue < 0f) printer.extrudedValue = 0f;
+            UpdateExtrudedMaterialUI(printer.extrudedValue);
+        }
+        else
+        {
+            //Add error message
+            if (warningPanel != null) warningPanel.ShowWarning((int)WarningMessages.HEAT);
+        }
+        
     }
 
     public void IncreaseXPosition()
@@ -577,8 +649,20 @@ public class PrinterUI : MonoBehaviour
     }
     public void Print()
     {
-        StartCoroutine(PrintSequence());
-        GameEventsManager.instance.PrintEventOccurred();
+        if (!materialExtrusionEventInvoked)
+        {
+            if (warningPanel != null) warningPanel.ShowWarning((int)WarningMessages.EXTRUSION);
+        }
+        else if (!homeEventInvoked)
+        {
+            if (warningPanel != null) warningPanel.ShowWarning((int)WarningMessages.HOME);
+        }
+        else
+        {
+            StartCoroutine(PrintSequence());
+            GameEventsManager.instance.PrintEventOccurred();
+        }
+        
     }
     // The sequence movement is based on the 3D printer in real life
     private IEnumerator PrintSequence()

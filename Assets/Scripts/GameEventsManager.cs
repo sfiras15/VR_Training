@@ -22,9 +22,11 @@ public class GameEventsManager : MonoBehaviour
         mainLevelQuests = new MainLevelQuests();
     }
     // Main level Events
-    public void MaterialLoadingEventOccurred()
+
+    // 3D printer Events
+    public void MaterialLoadingEventOccurred(bool value)
     {
-        mainLevelQuests.MaterialLoaded();
+        mainLevelQuests.MaterialLoaded(value);
     }
     public void HeatEventOccurred()
     {
@@ -46,6 +48,14 @@ public class GameEventsManager : MonoBehaviour
     {
         mainLevelQuests.BabyStepLevelAchieved();
     }
+
+    // Companion Events
+
+    public void MessageEventOccurred(int index)
+    {
+        mainLevelQuests.MessageRead(index);
+    }
+
 
 
     // Tutorial level Events

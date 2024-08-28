@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Printing
   m_EditorClassIdentifier: 
   <id>k__BackingField: Printing
-  displayName: Printing Procedure
+  displayName: Commands
   playerLevelRequirement: 0
   preRequisiteQuests: []
   questStepsPrefabs:
