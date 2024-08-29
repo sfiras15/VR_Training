@@ -13,11 +13,13 @@ MonoBehaviour:
   m_Name: Printing
   m_EditorClassIdentifier: 
   <id>k__BackingField: Printing
-  displayName: Print
+  displayName: Commands
   playerLevelRequirement: 0
   preRequisiteQuests: []
   questStepsPrefabs:
   - {fileID: 3868073662722483118, guid: adf588c9f36619d41a33e21e1af31059, type: 3}
   - {fileID: 3354255541751469078, guid: df9164bef296b594abde1e3d9eee36b1, type: 3}
   - {fileID: 2233528868496547283, guid: 01b970aecc1dfe1459a002fe022e8fa7, type: 3}
+  - {fileID: 6884077474005342749, guid: 65f2a35e65f53834e910dbdd9a85314b, type: 3}
+  - {fileID: 2830639519339345689, guid: 1f8bbfe8aaaef394bbebc6dbd9e86b46, type: 3}
   xpReward: 0

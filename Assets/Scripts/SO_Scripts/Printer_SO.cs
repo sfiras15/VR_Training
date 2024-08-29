@@ -12,10 +12,10 @@ public class Printer_SO : ScriptableObject
     public float moveDuration = 2f;
 
     // Event for moving the different components of the printer
-    public event Action<Axis, float> onMove;
+    public event Action<Axis, float,float> onMove;
 
-    public void Move(Axis axis,float value)
+    public void Move(Axis axis,float value,float duration)
     {
-        onMove?.Invoke(axis, value);
+        onMove?.Invoke(axis, value, duration);
     }
 }

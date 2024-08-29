@@ -13,6 +13,8 @@ public class GameEventsManager : MonoBehaviour
     public TutorialEvents tutorialEvents;
 
     public MainLevelQuests mainLevelQuests;
+
+    public event Action onTabletUsed;
     private void Awake()
     {
         if (instance == null) instance = this;  
@@ -22,11 +24,17 @@ public class GameEventsManager : MonoBehaviour
         mainLevelQuests = new MainLevelQuests();
     }
     // Main level Events
+
+    // 3D printer Events
+    public void MaterialLoadingEventOccurred(bool value)
+    {
+        mainLevelQuests.MaterialLoaded(value);
+    }
     public void HeatEventOccurred()
     {
         mainLevelQuests.HeatLevelAchieved();
     }
-    public void MaterialEventOccurred()
+    public void MaterialExtrusionEventOccurred()
     {
         mainLevelQuests.MaterialExtruded();
     }
@@ -34,7 +42,28 @@ public class GameEventsManager : MonoBehaviour
     {
         mainLevelQuests.HomePositionAchieved();
     }
+    public void PrintEventOccurred()
+    {
+        mainLevelQuests.PrintStarted();
+    }
+    public void BabyStepEventOccurred()
+    {
+        mainLevelQuests.BabyStepLevelAchieved();
+    }
 
+    // Companion Events
+
+    public void MessageEventOccurred(int index)
+    {
+        mainLevelQuests.MessageRead(index);
+    }
+
+    // Tablet event
+
+    public void TabletEventOccurred()
+    {
+        onTabletUsed?.Invoke();
+    }
 
     // Tutorial level Events
     public void TeleportationOccurred()

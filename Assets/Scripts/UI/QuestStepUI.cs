@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class QuestStepUI : MonoBehaviour
 {
-    [SerializeField] private TextMeshProUGUI stepText;
+    //[SerializeField] private TextMeshProUGUI stepText;
     [SerializeField] private TextMeshProUGUI descriptionText;
 
     private int questIndex;
@@ -18,9 +18,9 @@ public class QuestStepUI : MonoBehaviour
     {
         get { return questIndex; }
     }
-    public void Init(string step,string description,int index)
+    public void Init(string description,int index)
     {
-        stepText.text = step;
+        //stepText.text = step;
         descriptionText.text = description;
         questIndex = index;
     }

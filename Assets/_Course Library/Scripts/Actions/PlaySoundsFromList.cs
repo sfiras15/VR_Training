@@ -20,7 +20,12 @@ public class PlaySoundsFromList : MonoBehaviour
     {
         audioSource = GetComponent<AudioSource>();
     }
-
+    // function used by the companion only 
+    public void PlaySound()
+    {
+        PlayClip();
+        index = ++index % audioClips.Count;
+    }
     public void NextClip()
     {
         index = ++index % audioClips.Count;
@@ -64,6 +69,11 @@ public class PlaySoundsFromList : MonoBehaviour
     {
         audioSource.clip = audioClips[Mathf.Abs(index)];
         audioSource.Play();
+    }
+
+    public int CurrentIndex
+    {
+        get { return index; }
     }
 
     private void OnValidate()

@@ -27,14 +27,14 @@ public class PrinterAnimation : MonoBehaviour
     {
         if (printerSo != null) printerSo.onMove -= MoveGameObject;
     }
-    private void MoveGameObject(Axis axis, float valueInMM)
+    private void MoveGameObject(Axis axis, float valueInMM, float duration)
     {
         if (printerSo != null)
         {
             GameObject obj = GetTargetObject(axis);
             float valueInUnity = valueInMM / 1000.0f; // Convert millimeters to Unity units (meters)
             Vector3 direction = GetDirection(axis) * moveSpeed * valueInUnity;
-            StartCoroutine(MoveObjectCoroutine(obj, direction, printerSo.moveDuration));
+            StartCoroutine(MoveObjectCoroutine(obj, direction, duration));
         }
       
     }
