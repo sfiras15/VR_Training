@@ -69,7 +69,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: dc772efc330be464785be67d4a6ee8a6, type: 2}
+  - {fileID: 2100000, guid: dc64d5702eedb154a9f464b0f0bb42d6, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -722,8 +722,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278190080
-  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -802,6 +802,8 @@ MonoBehaviour:
   - Great job! You've completed the tutorial level and learned the basic interactions.
   - In the next level, you'll apply these interactions to the process of 3D printing.
   - Get ready to put your skills to the test!
+  maxLengthPerMessage: 175
+  messageDelay: 5.5
 --- !u!1001 &638960062691324374
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -44,5 +44,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2f0d57d0a8718564b8c6b1015d15ee83, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <questStepDescription>k__BackingField: Adjust the Z-Axis to get the right thickness
-    of material
+  <questStepDescription>k__BackingField: 'BabySteps: BabySteps -> Down 2mm -> Save'

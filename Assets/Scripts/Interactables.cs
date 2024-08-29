@@ -4,7 +4,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 
 public class Interactables : XRGrabInteractable
 {
-    [SerializeField] private Locomotion_SO locomotionSo;
+    [SerializeField] protected Locomotion_SO locomotionSo;
 
     private XRBaseController _controller;
 

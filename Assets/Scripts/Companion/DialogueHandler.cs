@@ -10,13 +10,13 @@ public class DialogueHandler : MonoBehaviour
     {
         TryGetComponent(out soundHandler);
     }
-    public void PlaySound()
+    public void PlaySound(int index)
     {
         if (soundHandler != null) 
         {
             // this will show subtitles for the read message
-            GameEventsManager.instance.MessageEventOccurred(soundHandler.CurrentIndex);
-            soundHandler.PlaySound();
+            GameEventsManager.instance.MessageEventOccurred(index);
+            soundHandler.PlayAtIndex(index);
 
             
         }

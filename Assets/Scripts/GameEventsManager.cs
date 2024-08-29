@@ -13,6 +13,8 @@ public class GameEventsManager : MonoBehaviour
     public TutorialEvents tutorialEvents;
 
     public MainLevelQuests mainLevelQuests;
+
+    public event Action onTabletUsed;
     private void Awake()
     {
         if (instance == null) instance = this;  
@@ -56,7 +58,12 @@ public class GameEventsManager : MonoBehaviour
         mainLevelQuests.MessageRead(index);
     }
 
+    // Tablet event
 
+    public void TabletEventOccurred()
+    {
+        onTabletUsed?.Invoke();
+    }
 
     // Tutorial level Events
     public void TeleportationOccurred()

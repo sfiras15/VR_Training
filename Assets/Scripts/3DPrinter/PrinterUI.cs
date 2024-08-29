@@ -17,6 +17,10 @@ public class PrinterUI : MonoBehaviour
     private Position[] positions;
     private BabyStep[] babySteps;
 
+
+    private FileSelectionMenu fileSelectionMenu;
+    private PrintingMenu printingMenu;
+
     private float updateInterval = 2f; // Time in seconds between updates
     private int incrementValue = 5; // temperature increment
 
@@ -57,6 +61,8 @@ public class PrinterUI : MonoBehaviour
         babySteps = GetComponentsInChildren<BabyStep>(true);
         printer = new Printer();
         warningPanel = GetComponentInChildren<WarningPanel>(true);
+        fileSelectionMenu = GetComponentInChildren<FileSelectionMenu>(true);
+        printingMenu = GetComponentInChildren<PrintingMenu>(true);
     }
 
     private void OnEnable()
@@ -659,6 +665,8 @@ public class PrinterUI : MonoBehaviour
         }
         else
         {
+            fileSelectionMenu.gameObject.SetActive(false);
+            printingMenu.gameObject.SetActive(true);
             StartCoroutine(PrintSequence());
             GameEventsManager.instance.PrintEventOccurred();
         }

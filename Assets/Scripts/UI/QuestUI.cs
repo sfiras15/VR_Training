@@ -55,7 +55,7 @@ public class QuestUI : MonoBehaviour
                 QuestStep questStep = questStepPrefab.GetComponent<QuestStep>();
 
                 QuestStepUI questUiObj = Object.Instantiate<QuestStepUI>(questStepUiPrefab, questStepsTransform);
-                questUiObj.Init("Step " + currentIndex + ":",questStep.questStepDescription, currentIndex-1);
+                questUiObj.Init(questStep.questStepDescription, currentIndex-1);
                 currentIndex++;
 
 

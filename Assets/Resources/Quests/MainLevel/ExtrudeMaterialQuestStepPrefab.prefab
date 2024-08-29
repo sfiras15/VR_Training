@@ -44,4 +44,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 768a70059d150da449486cad380357b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <questStepDescription>k__BackingField: Extrude at least 20mm of material
+  <questStepDescription>k__BackingField: 'Extrusion : Menu -> Movement -> Extrude
+    -> Load 10mm'

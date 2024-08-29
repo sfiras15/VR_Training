@@ -44,4 +44,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 481e8b5c05d65aa4f9f5b4885237510c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <questStepDescription>k__BackingField: Start Printing
+  <questStepDescription>k__BackingField: 'Print: Print -> OnBoardUSB -> Select file '

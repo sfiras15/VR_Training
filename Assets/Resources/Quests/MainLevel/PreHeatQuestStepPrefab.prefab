@@ -44,5 +44,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca37437bb72a96249840c4d3008fc094, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <questStepDescription>k__BackingField: "Heat the bed to 80 \xB0C and the Nozzle
-    to 220 \xB0C"
+  <questStepDescription>k__BackingField: "Pre heating : T0 -> Increase to 220\xB0
+    -> Nozzle -> Increase to 80\xB0"

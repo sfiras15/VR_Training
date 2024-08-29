@@ -44,4 +44,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 61dbe2ef310ff9447b1e4639b2705823, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <questStepDescription>k__BackingField: Move the nozzle to the home position
+  <questStepDescription>k__BackingField: 'Home : Menu -> Movement -> Home -> Home'
