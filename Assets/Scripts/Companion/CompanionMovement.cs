@@ -22,7 +22,9 @@ public class CompanionMovement : MonoBehaviour
     private bool homeReachedQuoteRead = false;
     private bool printQuoteRead = false;
     private bool babyStepQuoteRead = false;
-    private bool WaitPrintQuoteRead = false;
+    private bool waitPrintQuoteRead = false;
+    private bool printCompletedQuoteRead = false;
+    private bool printCooledDownQuoteRead = false;
     private void Awake()
     {
         TryGetComponent(out companionAnimation);
@@ -40,8 +42,11 @@ public class CompanionMovement : MonoBehaviour
                 GameEventsManager.instance.mainLevelQuests.onHeatLevelAchieved += PrinterHeat;
                 GameEventsManager.instance.mainLevelQuests.onMaterialExtruded += MaterialExtrusion;
                 GameEventsManager.instance.mainLevelQuests.onHomePositionAchieved += PrinterHome;
-                GameEventsManager.instance.mainLevelQuests.onPrintStarted += PrintStart;
+                GameEventsManager.instance.mainLevelQuests.onPrintPreparationStarting += PrintStart;
                 GameEventsManager.instance.mainLevelQuests.onBabyStepLevelAchieved += BabyStepCalibrated;
+                GameEventsManager.instance.onPrintCompleted += PrintComplete;
+                GameEventsManager.instance.mainLevelQuests.onPrinterCooledDown += PrinterCooledDown;
+
 
             }
         }
@@ -59,8 +64,10 @@ public class CompanionMovement : MonoBehaviour
                 GameEventsManager.instance.mainLevelQuests.onHeatLevelAchieved -= PrinterHeat;
                 GameEventsManager.instance.mainLevelQuests.onMaterialExtruded -= MaterialExtrusion;
                 GameEventsManager.instance.mainLevelQuests.onHomePositionAchieved -= PrinterHome;
-                GameEventsManager.instance.mainLevelQuests.onPrintStarted -= PrintStart;
+                GameEventsManager.instance.mainLevelQuests.onPrintPreparationStarting -= PrintStart;
                 GameEventsManager.instance.mainLevelQuests.onBabyStepLevelAchieved -= BabyStepCalibrated;
+                GameEventsManager.instance.onPrintCompleted -= PrintComplete;
+                GameEventsManager.instance.mainLevelQuests.onPrinterCooledDown -= PrinterCooledDown;
             }
         }
     }
@@ -112,11 +119,28 @@ public class CompanionMovement : MonoBehaviour
     }
     private void BabyStepCalibrated()
     {
-        if (!WaitPrintQuoteRead)
+        if (!waitPrintQuoteRead)
         {
-            WaitPrintQuoteRead = true;
+            waitPrintQuoteRead = true;
             if (dialogueHandler != null) dialogueHandler.PlaySound(7);
 
+        }
+    }
+
+    private void PrintComplete()
+    {
+        if (!printCompletedQuoteRead)
+        {
+            printCompletedQuoteRead = true;
+            if (dialogueHandler != null) dialogueHandler.PlaySound(8);
+        }
+    }
+    private void PrinterCooledDown()
+    {
+        if (!printCooledDownQuoteRead)
+        {
+            printCooledDownQuoteRead = true;
+            if (dialogueHandler != null) dialogueHandler.PlaySound(9);
         }
     }
 
@@ -192,11 +216,12 @@ public class CompanionMovement : MonoBehaviour
         if (companionAnimation != null)
         {
             yield return StartCoroutine(RotateTowardsTarget(secondPositionTransform.position));
+            if (dialogueHandler != null) dialogueHandler.PlaySound(1);
             companionAnimation.ActivateMovingAnimation(true);
             yield return StartCoroutine(MoveGameObject(secondPositionTransform.position, secondPositionTravelDuration));
             companionAnimation.ActivateMovingAnimation(false);
             yield return StartCoroutine(RotateTowardsTarget(playerTransform.position));
-            if (dialogueHandler != null) dialogueHandler.PlaySound(1);
+            
             positionReached = true;
         }
     }
