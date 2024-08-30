@@ -29,6 +29,7 @@ public class PrinterUI : MonoBehaviour
     private bool heatLevelEventInvoked = false;
     private bool materialExtrusionEventInvoked = false;
     private bool homeEventInvoked = false;
+    private bool cooldownEventInvoked = false;
 
 
     // variables for cooling down temperature 
@@ -51,6 +52,8 @@ public class PrinterUI : MonoBehaviour
     }
     private WarningPanel warningPanel;
 
+    // print status
+    private bool isPrintComplete = false;
     private void Awake()
     {
         // true to get even the inactive ones in hierarchy
@@ -73,7 +76,12 @@ public class PrinterUI : MonoBehaviour
             // Debug.Log("Subscribed to Increment.onIncrementChanged");
         }
         StartCoroutine(UpdateTemperaturesRoutine());
-        if (GameEventsManager.instance != null) GameEventsManager.instance.mainLevelQuests.onMaterialLoaded += MaterialLoadingQuest;
+        if (GameEventsManager.instance != null)
+        {
+            GameEventsManager.instance.mainLevelQuests.onMaterialLoaded += MaterialLoadingQuest;
+            GameEventsManager.instance.onPrintCompleted += PrintStatus;
+        }
+
     }
 
     private void OnDisable()
@@ -84,9 +92,17 @@ public class PrinterUI : MonoBehaviour
             // Debug.Log("Unsubscribed from Increment.onIncrementChanged");
         }
         StopCoroutine(UpdateTemperaturesRoutine());
-        if (GameEventsManager.instance != null) GameEventsManager.instance.mainLevelQuests.onMaterialLoaded -= MaterialLoadingQuest;
+        if (GameEventsManager.instance != null)
+        {
+            GameEventsManager.instance.mainLevelQuests.onMaterialLoaded -= MaterialLoadingQuest;
+            GameEventsManager.instance.onPrintCompleted -= PrintStatus;
+        }
     }
 
+    private void PrintStatus()
+    {
+        isPrintComplete = true;
+    }
     private void MaterialLoadingQuest(bool value)
     {
         materialLoadingEventInvoked = value;
@@ -140,12 +156,13 @@ public class PrinterUI : MonoBehaviour
         HeatingQuest();
         ExtrusionQuest();
         HomeQuest();
+        CoolingDownQuest();
         if (Input.GetKey(KeyCode.Space))
         {
             Print();
         }
     }
-
+    
     // Events for the quest system
     private void HeatingQuest()
     {
@@ -186,7 +203,21 @@ public class PrinterUI : MonoBehaviour
         }
         
     }
-    
+    private void CoolingDownQuest()
+    {
+        if (!isPrintComplete)
+        {
+            cooldownEventInvoked = false;
+            return;
+        }
+        if (isPrintComplete && (printer.currentBedTemperature == printer.initialBedTemperature && isBedCoolingDown) &&
+        (printer.currentBedTemperature == printer.initialBedTemperature && isBedCoolingDown))
+        {
+            cooldownEventInvoked = true;
+            GameEventsManager.instance.CooldownEventOccurred();
+
+        }
+    }
 
     private void UpdateExtrudedMaterialUI(float value)
     {
@@ -655,22 +686,23 @@ public class PrinterUI : MonoBehaviour
     }
     public void Print()
     {
-        if (!materialExtrusionEventInvoked)
-        {
-            if (warningPanel != null) warningPanel.ShowWarning((int)WarningMessages.EXTRUSION);
-        }
-        else if (!homeEventInvoked)
-        {
-            if (warningPanel != null) warningPanel.ShowWarning((int)WarningMessages.HOME);
-        }
-        else
-        {
-            fileSelectionMenu.gameObject.SetActive(false);
-            printingMenu.gameObject.SetActive(true);
-            StartCoroutine(PrintSequence());
-            GameEventsManager.instance.PrintEventOccurred();
-        }
-        
+        //if (!materialExtrusionEventInvoked)
+        //{
+        //    if (warningPanel != null) warningPanel.ShowWarning((int)WarningMessages.EXTRUSION);
+        //}
+        //else if (!homeEventInvoked)
+        //{
+        //    if (warningPanel != null) warningPanel.ShowWarning((int)WarningMessages.HOME);
+        //}
+        //else
+        //{
+        //    fileSelectionMenu.gameObject.SetActive(false);
+        //    printingMenu.gameObject.SetActive(true);
+        //    StartCoroutine(PrintSequence());
+        //    //GameEventsManager.instance.PrintEventOccurred();
+        //}
+        StartCoroutine(PrintSequence());
+
     }
     // The sequence movement is based on the 3D printer in real life
     private IEnumerator PrintSequence()
@@ -761,8 +793,29 @@ public class PrinterUI : MonoBehaviour
 
         // start ejecting material
         // Add a pause so for the UI to explain babySteps and then go back to ejecting materials
+        GameEventsManager.instance.PrintPreparationEventOccurred();
+        yield return new WaitForSeconds(1f); // the duration of the companion's explanation on babyStep calibration (22s)
         isMovingOnX = true;
-        yield return StartCoroutine(MoveToDestination(printer.nozzlePosition.x, -280f, Axis.X, isMovingOnX, 15f)); // from here on out add the Probe offset value on the Z axis
+        yield return StartCoroutine(MoveToDestination(printer.nozzlePosition.x, -320f, Axis.X, isMovingOnX, 5f)); // from here on out add the Probe offset value on the Z axis
+        GameEventsManager.instance.PurgeCompleted();
+        yield return new WaitForSeconds(5f);
+        // here add logic to extract some material/ change the color depending on the babyStep
+        
+        // Move the nozzle to the middle part of the bed
+        isMovingOnX = true;
+        StartCoroutine(MoveToDestination(printer.nozzlePosition.x, 0f, Axis.X, isMovingOnX, 1f));//Change duration values later
+        isMovingOnY = true;
+        yield return StartCoroutine(MoveToDestination(printer.nozzlePosition.y, 200f, Axis.Y, isMovingOnY, 1.5f));//Change duration values later
+        yield return new WaitForSeconds(0.25f);
+        // Start the actual print
+        GameEventsManager.instance.PrintStarted();
+        isMovingOnZ = true;
+        yield return StartCoroutine(MoveToDestination(printer.nozzlePosition.z, 15f, Axis.Z, isMovingOnZ, 10f)); // the Z value depends on the height of the model we are printing, adjust later
+
+        // Add print completed event which will trigger the dialogue of the companion 
+
+        GameEventsManager.instance.PrintCompleted();
+
     }
 
 }

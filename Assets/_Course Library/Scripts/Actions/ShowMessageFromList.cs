@@ -32,12 +32,12 @@ public class ShowMessageFromList : MonoBehaviour
 
     private void OnEnable()
     {
-        if (GameEventsManager.instance != null) GameEventsManager.instance.mainLevelQuests.onMessageRead += ShowMessageWithParts;
+        if (GameEventsManager.instance != null) GameEventsManager.instance.onMessageRead += ShowMessageWithParts;
     }
 
     private void OnDisable()
     {
-        if (GameEventsManager.instance != null) GameEventsManager.instance.mainLevelQuests.onMessageRead -= ShowMessageWithParts;
+        if (GameEventsManager.instance != null) GameEventsManager.instance.onMessageRead -= ShowMessageWithParts;
     }
     public void NextMessage()
     {

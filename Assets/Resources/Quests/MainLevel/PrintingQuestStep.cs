@@ -6,11 +6,11 @@ public class PrintingQuestStep : QuestStep
 {
     private void OnEnable()
     {
-        GameEventsManager.instance.mainLevelQuests.onPrintStarted += PrintingAchieved;
+        GameEventsManager.instance.mainLevelQuests.onPrintPreparationStarting += PrintingAchieved;
     }
     private void OnDisable()
     {
-        GameEventsManager.instance.mainLevelQuests.onPrintStarted -= PrintingAchieved;
+        GameEventsManager.instance.mainLevelQuests.onPrintPreparationStarting -= PrintingAchieved;
     }
 
     private void PrintingAchieved()

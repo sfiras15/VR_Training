@@ -15,6 +15,10 @@ public class GameEventsManager : MonoBehaviour
     public MainLevelQuests mainLevelQuests;
 
     public event Action onTabletUsed;
+
+    public event Action onPurgeCompleted;
+    public event Action onPrintStarted;
+    public event Action onPrintCompleted;
     private void Awake()
     {
         if (instance == null) instance = this;  
@@ -24,6 +28,19 @@ public class GameEventsManager : MonoBehaviour
         mainLevelQuests = new MainLevelQuests();
     }
     // Main level Events
+
+    public void PurgeCompleted()
+    {
+        onPurgeCompleted?.Invoke();
+    }
+    public void PrintStarted()
+    {
+        onPrintStarted?.Invoke();
+    }
+    public void PrintCompleted()
+    {
+        onPrintCompleted?.Invoke();
+    }
 
     // 3D printer Events
     public void MaterialLoadingEventOccurred(bool value)
@@ -42,20 +59,24 @@ public class GameEventsManager : MonoBehaviour
     {
         mainLevelQuests.HomePositionAchieved();
     }
-    public void PrintEventOccurred()
+    public void PrintPreparationEventOccurred()
     {
-        mainLevelQuests.PrintStarted();
+        mainLevelQuests.PrintPreparationStarted();
     }
     public void BabyStepEventOccurred()
     {
         mainLevelQuests.BabyStepLevelAchieved();
     }
+    public void CooldownEventOccurred()
+    {
+        mainLevelQuests.CooldownAchieved();
+    }
 
     // Companion Events
-
+    public event Action<int> onMessageRead;
     public void MessageEventOccurred(int index)
     {
-        mainLevelQuests.MessageRead(index);
+        onMessageRead?.Invoke(index);
     }
 
     // Tablet event

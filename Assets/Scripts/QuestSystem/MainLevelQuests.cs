@@ -33,10 +33,10 @@ public class MainLevelQuests
     }
 
     // Event for starting to print
-    public event Action onPrintStarted;
-    public void PrintStarted()
+    public event Action onPrintPreparationStarting;
+    public void PrintPreparationStarted()
     {
-        if (onPrintStarted != null) onPrintStarted();
+        if (onPrintPreparationStarting != null) onPrintPreparationStarting();
     }
 
     // Event for adjusting the zAxis during print
@@ -46,10 +46,12 @@ public class MainLevelQuests
         if (onBabyStepLevelAchieved != null) onBabyStepLevelAchieved();
     }
 
-    // Event for broadcasting the current read message by the companion
-    public event Action<int> onMessageRead;
-    public void MessageRead(int index)
+    // Event for cooling down the nozzle and printer
+    public event Action onPrinterCooledDown;
+    public void CooldownAchieved()
     {
-        if (onMessageRead != null) onMessageRead(index);
+        if (onPrinterCooledDown != null) onPrinterCooledDown();
     }
+
+
 }
