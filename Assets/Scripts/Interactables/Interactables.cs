@@ -31,8 +31,8 @@ public class Interactables : XRGrabInteractable
         if (locomotionSo != null && _controller != null)
         {
             locomotionSo.Controller = _controller;
-            locomotionSo.Held = false;
         }
+        locomotionSo.Held = false;
     }
 
     // This method will be changed based on the class that inherits it
@@ -45,6 +45,8 @@ public class Interactables : XRGrabInteractable
         //}
 
     }
+    // Method for when the interactable enters an xrSocket interactor
+    public virtual void SocketEnteredMethod(bool isEntered) { }
 
 
 }
