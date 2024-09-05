@@ -166,12 +166,12 @@ public class PrinterUI : MonoBehaviour
     // Events for the quest system
     private void HeatingQuest()
     {
-        if ((printer.currentBedTemperature == 50 && printer.currentNozzleTemperature == 50) && !heatLevelEventInvoked)
+        if ((printer.currentBedTemperature == 80 && printer.currentNozzleTemperature == 220) && !heatLevelEventInvoked)
         {
             heatLevelEventInvoked = true;
             GameEventsManager.instance.HeatEventOccurred();
         }
-        else if ((printer.currentBedTemperature != 50 || printer.currentNozzleTemperature != 50) && heatLevelEventInvoked)
+        else if ((printer.currentBedTemperature != 80 || printer.currentNozzleTemperature != 220) && heatLevelEventInvoked)
         {
             heatLevelEventInvoked = false;
         }
@@ -210,8 +210,8 @@ public class PrinterUI : MonoBehaviour
             cooldownEventInvoked = false;
             return;
         }
-        if (isPrintComplete && (printer.currentBedTemperature == printer.initialBedTemperature && isBedCoolingDown) &&
-        (printer.currentBedTemperature == printer.initialBedTemperature && isBedCoolingDown))
+        if (isPrintComplete && (printer.currentNozzleTemperature == printer.initialNozzleTemperature && isNozzleCoolingDown) &&
+        (printer.currentBedTemperature == printer.initialBedTemperature && isBedCoolingDown) && !cooldownEventInvoked)
         {
             cooldownEventInvoked = true;
             GameEventsManager.instance.CooldownEventOccurred();

@@ -13,8 +13,8 @@ public class Interactables : XRGrabInteractable
     {
         base.OnSelectEntering(args);
         var interactor = args.interactorObject as XRBaseControllerInteractor;
-        _controller = interactor.xrController;
-        if (locomotionSo != null )
+        if (interactor != null) _controller = interactor.xrController;
+        if (locomotionSo != null  && _controller != null)
         {
             locomotionSo.Controller = _controller;
             locomotionSo.Held = true;
@@ -27,8 +27,8 @@ public class Interactables : XRGrabInteractable
     {
         base.OnSelectExiting(args);
         var interactor = args.interactorObject as XRBaseControllerInteractor;
-        _controller = interactor.xrController;
-        if (locomotionSo != null)
+        if (interactor != null) _controller = interactor.xrController;
+        if (locomotionSo != null && _controller != null)
         {
             locomotionSo.Controller = _controller;
             locomotionSo.Held = false;

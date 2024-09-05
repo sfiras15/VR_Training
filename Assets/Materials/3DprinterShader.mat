@@ -30,7 +30,7 @@ Material:
     m_Ints: []
     m_Floats:
     - _ConstructGap: 0.1
-    - _ConstructY: 1.03
+    - _ConstructY: 0.83
     - _Glossiness: 0.5
     - _Metallic: 0
     m_Colors:
