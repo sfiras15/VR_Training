@@ -34,8 +34,8 @@ public class OnButtonPress : MonoBehaviour
 
     private void Start()
     {
-        // make sure the main level scene is the second scene in the build
-        if (SceneManager.GetActiveScene().buildIndex == 1) allowPress = true;
+        // make sure the main level scene is the third scene in the build
+        if (SceneManager.GetActiveScene().buildIndex == 2) allowPress = true;
     }
     private void OnEnable()
     {

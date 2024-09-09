@@ -166,12 +166,12 @@ public class PrinterUI : MonoBehaviour
     // Events for the quest system
     private void HeatingQuest()
     {
-        if ((printer.currentBedTemperature == 80 && printer.currentNozzleTemperature == 220) && !heatLevelEventInvoked)
+        if ((printer.currentBedTemperature == 70 && printer.currentNozzleTemperature == 220) && !heatLevelEventInvoked)
         {
             heatLevelEventInvoked = true;
             GameEventsManager.instance.HeatEventOccurred();
         }
-        else if ((printer.currentBedTemperature != 80 || printer.currentNozzleTemperature != 220) && heatLevelEventInvoked)
+        else if ((printer.currentBedTemperature != 70 || printer.currentNozzleTemperature != 220) && heatLevelEventInvoked)
         {
             heatLevelEventInvoked = false;
         }
