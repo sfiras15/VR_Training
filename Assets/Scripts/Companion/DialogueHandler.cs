@@ -23,17 +23,4 @@ public class DialogueHandler : MonoBehaviour
 
         
     }
-    // Update is called once per frame
-    void Update()
-    {
-        // For testing only remove later
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            // this will show subtitles for the read message
-            GameEventsManager.instance.MessageEventOccurred(soundHandler.CurrentIndex);
-            soundHandler.PlaySound();
-
-            
-        }
-    }
 }
