@@ -45,4 +45,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <questStepDescription>k__BackingField: "Pre heating : T0 -> Increase to 220\xB0
-    -> Nozzle -> Increase to 80\xB0"
+    -> Nozzle -> Increase to 70\xB0"

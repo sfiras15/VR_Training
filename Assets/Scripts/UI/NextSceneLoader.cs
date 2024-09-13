@@ -53,5 +53,14 @@ public class NextSceneLoader : MonoBehaviour
         // Allow scene activation
         asyncOperation.allowSceneActivation = true;
     }
+    public void QuitGame()
+    {
+        // Log message for when the game is played in the editor
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
+    }
 }
 

@@ -16,9 +16,17 @@ public class GameEventsManager : MonoBehaviour
 
     public event Action onTabletUsed;
 
+    // Event for when the printer finished the purging in print sequence
     public event Action onPurgeCompleted;
+
+    // Event for when the printer started printing in the print sequence
     public event Action onPrintStarted;
+
+    // Event for when the printer finished printing in the print sequence
     public event Action onPrintCompleted;
+
+    // Event for when the printer starts extruding material , in our case when the UI button is pressed or when the purge starts
+    public event Action<float> onExtrudingMaterial;
     private void Awake()
     {
         if (instance == null) instance = this;  
@@ -40,6 +48,11 @@ public class GameEventsManager : MonoBehaviour
     public void PrintCompleted()
     {
         onPrintCompleted?.Invoke();
+    }
+
+    public void MaterielExtrusion(float mm)
+    {
+        onExtrudingMaterial?.Invoke(mm);
     }
 
     // 3D printer Events

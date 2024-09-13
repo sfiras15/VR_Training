@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// Checks for button input on an input action
@@ -31,6 +32,11 @@ public class OnButtonPress : MonoBehaviour
         action.canceled -= Released;
     }
 
+    private void Start()
+    {
+        // make sure the main level scene is the third scene in the build
+        if (SceneManager.GetActiveScene().buildIndex == 2) allowPress = true;
+    }
     private void OnEnable()
     {
         action.Enable();

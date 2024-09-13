@@ -157,21 +157,21 @@ public class PrinterUI : MonoBehaviour
         ExtrusionQuest();
         HomeQuest();
         CoolingDownQuest();
-        if (Input.GetKey(KeyCode.Space))
-        {
-            Print();
-        }
+        //if (Input.GetKey(KeyCode.Space))
+        //{
+        //    Print();
+        //}
     }
     
     // Events for the quest system
     private void HeatingQuest()
     {
-        if ((printer.currentBedTemperature == 50 && printer.currentNozzleTemperature == 50) && !heatLevelEventInvoked)
+        if ((printer.currentBedTemperature == 70 && printer.currentNozzleTemperature == 220) && !heatLevelEventInvoked)
         {
             heatLevelEventInvoked = true;
             GameEventsManager.instance.HeatEventOccurred();
         }
-        else if ((printer.currentBedTemperature != 50 || printer.currentNozzleTemperature != 50) && heatLevelEventInvoked)
+        else if ((printer.currentBedTemperature != 70 || printer.currentNozzleTemperature != 220) && heatLevelEventInvoked)
         {
             heatLevelEventInvoked = false;
         }
@@ -210,8 +210,8 @@ public class PrinterUI : MonoBehaviour
             cooldownEventInvoked = false;
             return;
         }
-        if (isPrintComplete && (printer.currentBedTemperature == printer.initialBedTemperature && isBedCoolingDown) &&
-        (printer.currentBedTemperature == printer.initialBedTemperature && isBedCoolingDown))
+        if (isPrintComplete && (printer.currentNozzleTemperature == printer.initialNozzleTemperature && isNozzleCoolingDown) &&
+        (printer.currentBedTemperature == printer.initialBedTemperature && isBedCoolingDown) && !cooldownEventInvoked)
         {
             cooldownEventInvoked = true;
             GameEventsManager.instance.CooldownEventOccurred();
@@ -485,7 +485,9 @@ public class PrinterUI : MonoBehaviour
         if (heatLevelEventInvoked)
         {
             printer.extrudedValue += printer.incrementExtrusion;
+
             if (printer.extrudedValue > 30f) printer.extrudedValue = 30f;
+            else GameEventsManager.instance.MaterielExtrusion(printer.incrementExtrusion);
             UpdateExtrudedMaterialUI(printer.extrudedValue);
         }
         else
@@ -493,7 +495,12 @@ public class PrinterUI : MonoBehaviour
             //Add error message
             if (warningPanel != null) warningPanel.ShowWarning((int)WarningMessages.HEAT);
         }
-        
+        //printer.extrudedValue += printer.incrementExtrusion;
+
+        //if (printer.extrudedValue > 30f) printer.extrudedValue = 30f;
+        //else GameEventsManager.instance.MaterielExtrusion(printer.incrementExtrusion);
+        //UpdateExtrudedMaterialUI(printer.extrudedValue);
+
     }
 
     public void DecreaseExtrudedMaterial()
@@ -686,22 +693,22 @@ public class PrinterUI : MonoBehaviour
     }
     public void Print()
     {
-        //if (!materialExtrusionEventInvoked)
-        //{
-        //    if (warningPanel != null) warningPanel.ShowWarning((int)WarningMessages.EXTRUSION);
-        //}
-        //else if (!homeEventInvoked)
-        //{
-        //    if (warningPanel != null) warningPanel.ShowWarning((int)WarningMessages.HOME);
-        //}
-        //else
-        //{
-        //    fileSelectionMenu.gameObject.SetActive(false);
-        //    printingMenu.gameObject.SetActive(true);
-        //    StartCoroutine(PrintSequence());
-        //    //GameEventsManager.instance.PrintEventOccurred();
-        //}
-        StartCoroutine(PrintSequence());
+        if (!materialExtrusionEventInvoked)
+        {
+            if (warningPanel != null) warningPanel.ShowWarning((int)WarningMessages.EXTRUSION);
+        }
+        else if (!homeEventInvoked)
+        {
+            if (warningPanel != null) warningPanel.ShowWarning((int)WarningMessages.HOME);
+        }
+        else
+        {
+            fileSelectionMenu.gameObject.SetActive(false);
+            printingMenu.gameObject.SetActive(true);
+            StartCoroutine(PrintSequence());
+            //GameEventsManager.instance.PrintEventOccurred();
+        }
+        //StartCoroutine(PrintSequence());
 
     }
     // The sequence movement is based on the 3D printer in real life
@@ -794,7 +801,11 @@ public class PrinterUI : MonoBehaviour
         // start ejecting material
         // Add a pause so for the UI to explain babySteps and then go back to ejecting materials
         GameEventsManager.instance.PrintPreparationEventOccurred();
-        yield return new WaitForSeconds(1f); // the duration of the companion's explanation on babyStep calibration (22s)
+        yield return new WaitForSeconds(22f); // the duration of the companion's explanation on babyStep calibration (22s)
+
+        // Activate the extrusion effect
+        GameEventsManager.instance.MaterielExtrusion(5f);
+
         isMovingOnX = true;
         yield return StartCoroutine(MoveToDestination(printer.nozzlePosition.x, -320f, Axis.X, isMovingOnX, 5f)); // from here on out add the Probe offset value on the Z axis
         GameEventsManager.instance.PurgeCompleted();
