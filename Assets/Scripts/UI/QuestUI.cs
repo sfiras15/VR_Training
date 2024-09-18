@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 
 /// <summary>
@@ -18,8 +20,14 @@ public class QuestUI : MonoBehaviour
     [SerializeField] private Transform questStepsTransform;
 
     [SerializeField] private QuestUiSo questUISo;
+    [SerializeField] private GameObject replayButton;
 
     private Quest quest;
+
+    private void Awake()
+    {
+        if (replayButton != null) replayButton.SetActive(false);
+    }
 
     private void OnEnable()
     {
@@ -86,6 +94,13 @@ public class QuestUI : MonoBehaviour
         {
             Destroy(questStepsTransform.GetChild(i).gameObject);
         }
-        questName.text = "Quest name";
+        questName.text = "";
+        replayButton.SetActive(true);
+    }
+
+    // Used by the replayButton
+    public void ReloadScene()
+    {
+        SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
     }
 }

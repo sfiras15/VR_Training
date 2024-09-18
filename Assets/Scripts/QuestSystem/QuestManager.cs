@@ -74,7 +74,7 @@ public class QuestManager : MonoBehaviour
             // trigger this event to update the UI and update the state of the quests
             GameEventsManager.instance.questEvents.FinishQuest(quest.info.id);
         }
-        Debug.Log("advance quest : " + id);
+        //Debug.Log("advance quest : " + id);
     }
     public void FinishQuest(string id)
     {

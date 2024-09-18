@@ -30,7 +30,7 @@ public class PrinterUI : MonoBehaviour
     private bool materialExtrusionEventInvoked = false;
     private bool homeEventInvoked = false;
     private bool cooldownEventInvoked = false;
-
+    private bool babyStepEventInvoked = false;
 
     // variables for cooling down temperature 
     private bool isBedCoolingDown = false;
@@ -54,6 +54,11 @@ public class PrinterUI : MonoBehaviour
 
     // print status
     private bool isPrintComplete = false;
+
+    // BabySteps
+    private bool babyStepsAdjusted = false;
+    private bool printingSequenceInProgress = false;
+    
     private void Awake()
     {
         // true to get even the inactive ones in hierarchy
@@ -157,6 +162,8 @@ public class PrinterUI : MonoBehaviour
         ExtrusionQuest();
         HomeQuest();
         CoolingDownQuest();
+
+        // for testing only
         //if (Input.GetKey(KeyCode.Space))
         //{
         //    Print();
@@ -664,7 +671,18 @@ public class PrinterUI : MonoBehaviour
         printer.probeOffset += printer.currentBabyStep;
         printer.currentBabyStep = 0;
         // Add a condition here that checks the right thickness of the material before triggering the event
-        GameEventsManager.instance.mainLevelQuests.BabyStepLevelAchieved();
+        if (printer.probeOffset == -2f && !babyStepEventInvoked && printingSequenceInProgress)
+        {
+            babyStepEventInvoked = true;
+            GameEventsManager.instance.mainLevelQuests.BabyStepLevelAchieved();
+            babyStepsAdjusted = true;
+        }
+        else
+        {
+            babyStepEventInvoked = false;
+        }
+           
+       
         UpdateBabyStepUI();
     }
     // Used on the reset button and the back button of the BabyStep menu
@@ -706,14 +724,15 @@ public class PrinterUI : MonoBehaviour
             fileSelectionMenu.gameObject.SetActive(false);
             printingMenu.gameObject.SetActive(true);
             StartCoroutine(PrintSequence());
-            //GameEventsManager.instance.PrintEventOccurred();
         }
+        // for debugging
         //StartCoroutine(PrintSequence());
 
     }
     // The sequence movement is based on the 3D printer in real life
     private IEnumerator PrintSequence()
     {
+
         // Maybe add home sequence to assure it starts from there
 
         // Move the nozzle to bottom left part of the bed
@@ -798,10 +817,11 @@ public class PrinterUI : MonoBehaviour
         isMovingOnZ = true;
         yield return StartCoroutine(MoveToDestination(printer.nozzlePosition.z, -200f, Axis.Z, isMovingOnZ, 0.5f)); // from here on out add the Probe offset value on the Z axis
 
+        printingSequenceInProgress = true;
         // start ejecting material
         // Add a pause so for the UI to explain babySteps and then go back to ejecting materials
         GameEventsManager.instance.PrintPreparationEventOccurred();
-        yield return new WaitForSeconds(22f); // the duration of the companion's explanation on babyStep calibration (22s)
+        yield return new WaitUntil(() => babyStepsAdjusted); // eject material when the babySteps have been adjusted
 
         // Activate the extrusion effect
         GameEventsManager.instance.MaterielExtrusion(5f);
@@ -824,7 +844,7 @@ public class PrinterUI : MonoBehaviour
         yield return StartCoroutine(MoveToDestination(printer.nozzlePosition.z, 15f, Axis.Z, isMovingOnZ, 10f)); // the Z value depends on the height of the model we are printing, adjust later
 
         // Add print completed event which will trigger the dialogue of the companion 
-
+        printingSequenceInProgress = false;
         GameEventsManager.instance.PrintCompleted();
 
     }

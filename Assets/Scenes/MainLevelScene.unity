@@ -953,7 +953,7 @@ PrefabInstance:
     - target: {fileID: 6598815579406187037, guid: 18ddb545287c546e19cc77dc9fbb2189,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -27890,7 +27890,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 12f283a5690f5794bba025f8ecfb52ea, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  material: {fileID: 0}
+  material: {fileID: 2100000, guid: 00fbdac641b10bc43898b1fbb241427a, type: 2}
 --- !u!1 &2507196576923313226
 GameObject:
   m_ObjectHideFlags: 0
@@ -36987,7 +36987,7 @@ MonoBehaviour:
   m_fontColor32:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
+  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -37458,7 +37458,7 @@ Transform:
   m_GameObject: {fileID: 3708837529196295834}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.316, y: 0, z: 0.02}
+  m_LocalPosition: {x: -0.185, y: 0, z: 0.02}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
